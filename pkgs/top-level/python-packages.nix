@@ -4491,6 +4491,8 @@ in {
 
   phik = callPackage ../development/python-modules/phik { };
 
+  phonemizer = callPackage ../development/python-modules/phonemizer { };
+
   phonenumbers = callPackage ../development/python-modules/phonenumbers { };
 
   phonopy = callPackage ../development/python-modules/phonopy { };
