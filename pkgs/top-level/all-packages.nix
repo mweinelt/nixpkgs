@@ -1293,6 +1293,8 @@ in
     then python.pkgs.tensorflow.libtensorflow
     else libtensorflow-bin;
 
+  tensorboardx = callPackage ../tools/misc/tensorboardx { };
+
   behdad-fonts = callPackage ../data/fonts/behdad-fonts { };
 
   bless = callPackage ../applications/editors/bless { };
