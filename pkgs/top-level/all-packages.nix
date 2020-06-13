@@ -24238,7 +24238,7 @@ in
 
   tremulous = callPackage ../games/tremulous { };
 
-  tts = callPackage ../applications/audio/tts { };
+  tts = python3.pkgs.toPythonApplication python3.pkgs.tts;
 
   tuxpaint = callPackage ../games/tuxpaint { };
 
