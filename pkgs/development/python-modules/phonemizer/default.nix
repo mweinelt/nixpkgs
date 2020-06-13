@@ -1,10 +1,23 @@
-{ lib, python3Packages, pkgs }:
+{ lib
+, substituteAll
+, buildPythonApplication
+, fetchPypi
+, python3Packages
+, pkgs
+, joblib
+, segments
+, attrs
+, espeak-ng
+, pytest
+, pytestrunner
+, pytestcov
+}:
 
-python3Packages.buildPythonApplication rec {
+buildPythonApplication rec {
   pname = "phonemizer";
   version = "2.2";
 
-  src = python3Packages.fetchPypi {
+  src = fetchPypi {
     inherit pname version;
     sha256 = "16hpfgzvc6r6f8khjqr62hdwsa6vhv6sxphg0879i1jfyaq5008b";
   };
@@ -13,11 +26,14 @@ python3Packages.buildPythonApplication rec {
     sed -i -e '/\'pytest-runner\'/d setup.py
   '';
 
-  buildInputs = with pkgs; [
-    espeak
+  patches = [
+    (substituteAll {
+      src = ./espeak-path.patch;
+      espeak = "${lib.getBin espeak-ng}/bin/espeak";
+    })
   ];
 
-  propagatedBuildInputs = with python3Packages; [
+  propagatedBuildInputs = [
     joblib
     segments
     attrs
@@ -26,14 +42,12 @@ python3Packages.buildPythonApplication rec {
   # tests fail due to missing festival
   doCheck = false;
 
-  checkInputs = with python3Packages; [
+  checkInputs = [
     pytest
     pytestrunner
     pytestcov
-  ] ++ (with pkgs; [
-    espeak
     # festival is not packaged in nixpkgs :(
-  ]);
+  ];
 
   meta = with lib; {
     homepage = "https://github.com/bootphon/phonemizer";
