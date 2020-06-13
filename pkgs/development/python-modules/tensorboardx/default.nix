@@ -1,6 +1,19 @@
-{ lib, pkgs, python3Packages, fetchFromGitHub, glibcLocales }:
+{ lib, pkgs
+, buildPythonPackage
+, fetchFromGitHub
+, crc32c
+, matplotlib
+, numpy
+, protobuf
+, pytest
+, pytorch
+, boto3
+, moto
+, visdom
+, wget
+}:
 
-python3Packages.buildPythonApplication rec {
+buildPythonPackage rec {
   pname = "tensorboardX";
   version = "2.0";
 
@@ -11,22 +24,21 @@ python3Packages.buildPythonApplication rec {
     sha256 = "0qqalq0fhbx0wnd8wdwhyhkkv2brvj9qbk3373vk3wjxbribf5c7";
   };
 
-  propagatedBuildInputs = with python3Packages; [
+  propagatedBuildInputs = [
     crc32c
     matplotlib
     numpy
     protobuf
   ];
 
-  checkInputs = with python3Packages; [
+  checkInputs = [
     pytest
     pytorch
     boto3
     moto
-  ] ++ (with pkgs; [
     visdom
     wget
-  ]);
+  ];
 
   doCheck = false;
 
@@ -36,4 +48,3 @@ python3Packages.buildPythonApplication rec {
     license = lib.licenses.mit;
   };
 }
-
