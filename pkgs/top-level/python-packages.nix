@@ -5205,6 +5205,8 @@ in {
 
   premailer = callPackage ../development/python-modules/premailer { };
 
+  prettyparse = callPackage ../development/python-modules/prettyparse { };
+
   prettytable = callPackage ../development/python-modules/prettytable { };
 
   property-manager = callPackage ../development/python-modules/property-manager { };
