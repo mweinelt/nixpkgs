@@ -5348,6 +5348,8 @@ in
 
   mycli = callPackage ../tools/admin/mycli { };
 
+  mycroft-precise = callPackage ../applications/voice-assistant/mycroft/precise.nix { };
+
   mydumper = callPackage ../tools/backup/mydumper { };
 
   mysql2pgsql = callPackage ../tools/misc/mysql2pgsql { };
