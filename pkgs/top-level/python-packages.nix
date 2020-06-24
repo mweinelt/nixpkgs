@@ -737,6 +737,8 @@ in {
 
   firetv = callPackage ../development/python-modules/firetv { };
 
+  fitipy = callPackage ../development/python-modules/fitipy { };
+
   flower = callPackage ../development/python-modules/flower { };
 
   flufl_bounce = callPackage ../development/python-modules/flufl/bounce.nix { };
