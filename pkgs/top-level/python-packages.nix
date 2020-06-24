@@ -5199,6 +5199,8 @@ in {
 
   prawcore = callPackage ../development/python-modules/prawcore { };
 
+  precise-runner = callPackage ../development/python-modules/precise-runner { };
+
   premailer = callPackage ../development/python-modules/premailer { };
 
   prettytable = callPackage ../development/python-modules/prettytable { };
