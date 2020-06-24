@@ -6144,6 +6144,8 @@ in {
 
   python-vlc = callPackage ../development/python-modules/python-vlc { };
 
+  wavio = callPackage ../development/python-modules/wavio { };
+
   weasyprint = callPackage ../development/python-modules/weasyprint { };
 
   webassets = callPackage ../development/python-modules/webassets { };
