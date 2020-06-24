@@ -5915,6 +5915,8 @@ in {
 
   spark_parser = callPackage ../development/python-modules/spark_parser { };
 
+  speechpy-fast = callPackage ../development/python-modules/speechpy-fast { };
+
   sphinx = if isPy3k then
     callPackage ../development/python-modules/sphinx { }
   else
