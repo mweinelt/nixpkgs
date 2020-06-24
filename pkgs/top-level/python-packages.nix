@@ -5905,6 +5905,8 @@ in {
 
   snuggs = callPackage ../development/python-modules/snuggs { };
 
+  sonopy = callPackage ../development/python-modules/sonopy { };
+
   spake2 = callPackage ../development/python-modules/spake2 { };
 
   sphfile = callPackage ../development/python-modules/sphfile { };
