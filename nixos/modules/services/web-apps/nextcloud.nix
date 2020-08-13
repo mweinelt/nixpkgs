@@ -570,7 +570,7 @@ in {
                 try_files $uri/ =404;
                 index index.php;
               '';
-              "~ \\.(?:css|js|woff2?|svg|gif)$".extraConfig = ''
+              "~ \\.(?:css|js|map|woff2?|svg|gif)$".extraConfig = ''
                 try_files $uri /index.php$request_uri;
                 add_header Cache-Control "public, max-age=15778463";
                 add_header X-Content-Type-Options nosniff;
