@@ -1,6 +1,7 @@
 { stdenv
 , lib
 , fetchFromGitHub
+, fetchpatch
 , python3
 , inetutils
 , nixosTests
@@ -179,6 +180,11 @@ in with py.pkgs; buildPythonApplication rec {
 
   # leave this in, so users don't have to constantly update their downstream patch handling
   patches = [
+    (fetchpatch {
+      # Add brightsky weather entity (#37800)
+      url = "https://github.com/home-assistant/core/pull/37800.patch";
+      sha256 = "1nx7ir5gh8x8j8hyfsqhlirgg6vpxpkfgyxm6vjm2nsksnnbkpmw";
+    })
   ];
 
   postPatch = ''

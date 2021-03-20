@@ -97,6 +97,7 @@
     "bmw_connected_drive" = ps: with ps; [ ]; # missing inputs: bimmer_connected
     "bond" = ps: with ps; [ ]; # missing inputs: bond-api
     "braviatv" = ps: with ps; [ bravia-tv ];
+    "brightsky" = ps: with ps; [ hass-brightsky-client ];
     "broadlink" = ps: with ps; [ broadlink ];
     "brother" = ps: with ps; [ brother ];
     "brottsplatskartan" = ps: with ps; [ brottsplatskartan ];
