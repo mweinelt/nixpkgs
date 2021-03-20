@@ -3083,6 +3083,8 @@ in {
 
   HAP-python = callPackage ../development/python-modules/HAP-python { };
 
+  hass-brightsky-client = callPackage ../development/python-modules/hass-brightsky-client { };
+
   hass-nabucasa = callPackage ../development/python-modules/hass-nabucasa { };
 
   hatasmota = callPackage ../development/python-modules/hatasmota { };
