@@ -45,6 +45,10 @@ stdenv.mkDerivation rec {
     sha256 = "16n466an72fkick4j1phfg5a8p7f96vbnw80bgbr05bh6cvgx6z2";
   };
 
+  patches = [
+    ./curl-accept-ranges-not-on-dirs.patch
+  ];
+
   outputs = [ "bin" "dev" "out" "man" "devdoc" ];
   separateDebugInfo = stdenv.isLinux;
 

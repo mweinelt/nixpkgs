@@ -1,0 +1,29 @@
+diff -r -u curl-7.76.0-pristine/lib/file.c curl-7.76.0/lib/file.c
+--- curl-7.76.0-pristine/lib/file.c	2021-02-22 11:47:54.000000000 +0000
++++ curl-7.76.0/lib/file.c	2021-04-03 17:23:47.677582417 +0000
+@@ -419,10 +419,12 @@
+         return result;
+     }
+ 
+-    result = Curl_client_write(data, CLIENTWRITE_HEADER,
+-                               (char *)"Accept-ranges: bytes\r\n", 0);
+-    if(result)
+-      return result;
++    if(!S_ISDIR(statbuf.st_mode)) {
++      result = Curl_client_write(data, CLIENTWRITE_HEADER,
++                                 (char *)"Accept-ranges: bytes\r\n", 0);
++      if(result)
++        return result;
++    }
+ 
+     filetime = (time_t)statbuf.st_mtime;
+     result = Curl_gmtime(filetime, &buffer);
+@@ -464,7 +466,7 @@
+     data->state.resume_from += (curl_off_t)statbuf.st_size;
+   }
+ 
+-  if(data->state.resume_from <= expected_size)
++  if(data->state.resume_from <= expected_size || data->state.resume_from == 0)
+     expected_size -= data->state.resume_from;
+   else {
+     failf(data, "failed to resume file:// transfer");
