@@ -245,22 +245,71 @@ in {
         rm -f "${cfg.configDir}/ui-lovelace.yaml"
         ln -s ${lovelaceConfigFile} "${cfg.configDir}/ui-lovelace.yaml"
       '');
-      serviceConfig = {
+      serviceConfig = let
+        # List of capabilities to equip home-assistant with, depending on configured components
+        # Converted to a string, so an empty list would not lead to no capability bounding set at all
+        capabilities = toString (unique (optionals (useComponent "bluetooth_tracker" || useComponent "bluetooth_le_tracker") [
+          # Required for interaction with hci devices and bluetooth sockets
+          # https://www.home-assistant.io/integrations/bluetooth_le_tracker/#rootless-setup-on-core-installs
+          "CAP_NET_ADMIN"
+          "CAP_NET_RAW"
+        ] ++ lib.optionals (useComponent "emulated_hue") [
+          # Alexa looks for the service on port 80
+          # https://www.home-assistant.io/integrations/emulated_hue
+          "CAP_NET_BIND_SERVICE"
+        ] ++ lib.optionals (useComponent "nmap_tracker") [
+          # https://www.home-assistant.io/integrations/nmap_tracker#linux-capabilities
+          "CAP_NET_ADMIN"
+          "CAP_NET_BIND_SERVICE"
+          "CAP_NET_RAW"
+        ]));
+      in {
         ExecStart = "${package}/bin/hass --config '${cfg.configDir}'";
         ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
         User = "hass";
         Group = "hass";
         Restart = "on-failure";
+        KillSignal = "SIGINT";
+
+        # Hardening
+        AmbientCapabilities = capabilities;
+        CapabilityBoundingSet = capabilities;
+        LockPersonality = true;
+        MemoryDenyWriteExecute = true;
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        PrivateUsers = false; # enabling breaks capabilities, maybe more
+        ProtectClock = true;
+        ProtectControlGroups = true;
+        ProtectHome = true;
+        ProtectHostname = true;
+        ProtectKernelLogs = true;
+        ProtectKernelModules = true;
+        ProtectKernelTunables = true;
+        ProtectProc = "invisible";
+        ProcSubset = "pid";
         ProtectSystem = "strict";
+        RemoveIPC = true;
         ReadWritePaths = let
+          # Allow rw access to explicitly configured paths
           cfgPath = [ "config" "homeassistant" "allowlist_external_dirs" ];
           value = attrByPath cfgPath [] cfg;
           allowPaths = if isList value then value else singleton value;
         in [ "${cfg.configDir}" ] ++ allowPaths;
-        KillSignal = "SIGINT";
-        PrivateTmp = true;
-        RemoveIPC = true;
-        AmbientCapabilities = "cap_net_raw,cap_net_admin+eip";
+        RestrictAddressFamilies = [
+          "AF_UNIX"
+          "AF_INET"
+          "AF_INET6"
+        ];
+        RestrictNamespaces = true;
+        RestrictRealtime = true;
+        RestrictSUIDSGID = true;
+        SystemCallArchitectures = "native";
+        SystemCallFilter = [
+          "@system-service"
+          "~@privileged"
+        ];
+        UMask = "0077";
       };
       path = [
         "/run/wrappers" # needed for ping
