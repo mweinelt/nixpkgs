@@ -2,11 +2,15 @@ import ./make-test-python.nix ({ pkgs, lib, ... }:
 
 let
   configDir = "/var/lib/foobar";
+  userName = "admin";
+  password = "secret";
 in {
   name = "home-assistant";
   meta.maintainers = lib.teams.home-assistant.members;
 
   nodes.hass = { pkgs, ... }: {
+    virtualisation.memorySize = 1024;
+
     services.postgresql = {
       enable = true;
       ensureDatabases = [ "hass" ];
@@ -79,6 +83,7 @@ in {
         # https://www.home-assistant.io/integrations/logger/
         logger = {
           default = "info";
+          logs."homeassistant.components.http" = "debug";
         };
       };
 
@@ -108,6 +113,124 @@ in {
       inheritParentConfig = true;
       configuration.services.home-assistant.config.esphome = {};
     };
+
+    environment.systemPackages = let
+      testRunner = pkgs.writers.writePython3Bin "test-runner" {
+        libraries = with pkgs.python3Packages; [ selenium structlog ];
+      } ''
+        from os import mkdir
+        from selenium.webdriver import Chrome
+        from selenium.webdriver.firefox.options import Options
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from selenium.webdriver.common.by import By
+        # from selenium.webdriver.common.keys import Keys
+
+        mkdir("/tmp/screenshots")
+
+        options = Options()
+        options.add_argument("--headless")
+        driver = Chrome(options=options)
+        wait = WebDriverWait(driver, 10)
+
+        # Wait for browser startup
+        driver.implicitly_wait(10)
+
+        driver.get("http://localhost:8123/onboarding.html")
+        wait.until(EC.title_contains("Home Assistant"))
+
+        # press space to trigger a redraw
+        # driver.find_element_by_tag_name('body').send_keys(Keys.SPACE)
+
+        driver.save_screenshot("/tmp/screenshots/step_onboarding_user.png")
+
+
+        def select(*argv):
+            script = "return document"
+            for arg in argv:
+                script += arg
+            print(script)
+            return driver.execute_script(script)
+
+
+        def qs(selector, shadow_root=False):
+            ret = f".querySelector('{selector}')"
+            if shadow_root:
+                ret += ".shadowRoot"
+            return ret
+
+
+        def set_attribute(key, value, element):
+            driver.execute_script(
+                f"arguments[0].setAttribute('{key}', '{value}')",
+                element
+            )
+
+
+        onboarding = driver.find_element(
+          By.TAG_NAME, "ha-onboarding").shadow_root
+        onboarding_create_user = onboarding.find_element(
+          By.TAG_NAME, "onboarding-create-user")[0].shadow_root
+        ha_form = onboarding_create_user.find_element(
+          By.TAG_NAME, "ha-form")[0].shadow_root
+        ha_selectors = ha_form.find_elements(
+          By.TAG_NAME, "ha-selector").shadow_root
+        print(ha_selectors)
+
+
+        input_name = select(
+            qs('ha-onboarding', shadow_root=True),
+            qs('onboarding-create-user', shadow_root=True),
+            qs('form > paper-input:nth-child(1)', shadow_root=True),
+            qs('#container > iron-input > input')
+        )
+        set_attribute("value", "${userName}", input_name)
+
+        input_username = select(
+            qs('ha-onboarding', shadow_root=True),
+            qs('onboarding-create-user', shadow_root=True),
+            qs('form > paper-input:nth-child(2)', shadow_root=True),
+            qs('#container > iron-input > input')
+        )
+        set_attribute("value", "${userName}", input_username)
+
+        input_password1 = select(
+            qs('ha-onboarding', shadow_root=True),
+            qs('onboarding-create-user', shadow_root=True),
+            qs('form > paper-input:nth-child(3)', shadow_root=True),
+            qs('#container > iron-input > input')
+        )
+        set_attribute("value", "${password}", input_password1)
+
+        input_password2 = select(
+            qs('ha-onboarding', shadow_root=True),
+            qs('onboarding-create-user', shadow_root=True),
+            qs('form > paper-input:nth-child(4)', shadow_root=True),
+            qs('#container > iron-input')
+        )
+        set_attribute("value", "${password}", input_password2)
+
+        driver.save_screenshot("/tmp/screenshots/step_onboarding_user2.png")
+
+        button_create_account = select(
+            qs('ha-onboarding', shadow_root=True),
+            qs('onboarding-create-user', shadow_root=True),
+            qs('mwc-button', shadow_root=True),
+            qs('button')
+        )
+        button_create_account.click()
+
+        driver.save_screenshot("/tmp/screenshots/step_onboarding_core_config.png")
+
+
+        driver.close()
+        print("close")
+      '';
+    in with pkgs; [
+      chromium
+      chromedriver
+      testRunner
+    ];
   };
 
   testScript = { nodes, ... }: let
@@ -192,5 +315,11 @@ in {
     with subtest("Check systemd unit hardening"):
         hass.log(hass.succeed("systemctl cat home-assistant.service"))
         hass.log(hass.succeed("systemd-analyze security home-assistant.service"))
+
+    with subtest("Test onboarding"):
+        hass.execute(
+            "systemd-run --wait --unit hass-onboarding -E PATH=${pkgs.geckodriver}/bin:$PATH -E PYTHONUNBUFFERED=1 test-runner"
+        )
+        hass.copy_from_vm("/tmp/screenshots")
   '';
 })
