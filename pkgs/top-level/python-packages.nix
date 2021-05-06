@@ -6889,6 +6889,8 @@ in {
 
   pyschemes = callPackage ../development/python-modules/pyschemes { };
 
+  pyshadow = callPackage ../development/python-modules/pyshadow { };
+
   pyshark = callPackage ../development/python-modules/pyshark { };
 
   pysiaalarm = callPackage ../development/python-modules/pysiaalarm { };
