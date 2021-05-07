@@ -51,6 +51,7 @@ let
     intelmetool = generic {
       pname = "intelmetool";
       meta.description = "Dump interesting things about Management Engine";
+      meta.platforms = [ "x86_64-linux" "i686-linux" ];
       buildInputs = [ pciutils zlib ];
     };
     cbfstool = generic {
