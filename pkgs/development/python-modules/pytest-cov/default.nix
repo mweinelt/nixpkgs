@@ -3,11 +3,11 @@
 
 buildPythonPackage rec {
   pname = "pytest-cov";
-  version = "2.11.1";
+  version = "2.12.1";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "359952d9d39b9f822d9d29324483e7ba04a3a17dd7d05aa6beb7ea01e359e5f7";
+    sha256 = "261ceeb8c227b726249b376b8526b600f38667ee314f910353fa318caa01f4d7";
   };
 
   buildInputs = [ pytest ];
