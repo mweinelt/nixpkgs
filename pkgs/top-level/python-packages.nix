@@ -3160,6 +3160,8 @@ in {
 
   habanero = callPackage ../development/python-modules/habanero { };
 
+  habitipy = callPackage ../development/python-modules/habitipy { };
+
   hachoir = callPackage ../development/python-modules/hachoir { };
 
   hdate = callPackage ../development/python-modules/hdate { };
@@ -3171,6 +3173,8 @@ in {
   halo = callPackage ../development/python-modules/halo { };
 
   handout = callPackage ../development/python-modules/handout { };
+
+  hangups = callPackage ../development/python-modules/hangups { };
 
   hap-python = callPackage ../development/python-modules/hap-python { };
 
@@ -5262,6 +5266,10 @@ in {
 
   pyflick = callPackage ../development/python-modules/pyflick { };
 
+  pyheos = callPackage ../development/python-modules/pyheos { };
+
+  pyhiveapi = callPackage ../development/python-modules/pyhiveapi { };
+
   pynndescent = callPackage ../development/python-modules/pynndescent { };
 
   pynobo = callPackage ../development/python-modules/pynobo { };
@@ -7311,6 +7319,8 @@ in {
 
   readchar = callPackage ../development/python-modules/readchar { };
 
+  readlike = callPackage ../development/python-modules/readlike { };
+
   readme = callPackage ../development/python-modules/readme { };
 
   readme_renderer = callPackage ../development/python-modules/readme_renderer { };
@@ -7348,6 +7358,8 @@ in {
   relatorio = callPackage ../development/python-modules/relatorio { };
 
   rencode = callPackage ../development/python-modules/rencode { };
+
+  reparser = callPackage ../development/python-modules/reparser { };
 
   repeated_test = callPackage ../development/python-modules/repeated_test { };
 
@@ -8731,6 +8743,8 @@ in {
   umap-learn = callPackage ../development/python-modules/umap-learn { };
 
   u-msgpack-python = callPackage ../development/python-modules/u-msgpack-python { };
+
+  unasync = callPackage ../development/python-modules/unasync { };
 
   uncertainties = callPackage ../development/python-modules/uncertainties { };
 

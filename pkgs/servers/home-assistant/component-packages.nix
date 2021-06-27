@@ -335,8 +335,8 @@
     "gstreamer" = ps: with ps; [ ]; # missing inputs: gstreamer-player
     "gtfs" = ps: with ps; [ pygtfs ];
     "guardian" = ps: with ps; [ aioguardian ];
-    "habitica" = ps: with ps; [ ]; # missing inputs: habitipy
-    "hangouts" = ps: with ps; [ ]; # missing inputs: hangups
+    "habitica" = ps: with ps; [ habitipy ];
+    "hangouts" = ps: with ps; [ hangups ];
     "harman_kardon_avr" = ps: with ps; [ ]; # missing inputs: hkavr
     "harmony" = ps: with ps; [ aioharmony ];
     "hassio" = ps: with ps; [ aiohttp-cors home-assistant-frontend pillow ];
@@ -344,7 +344,7 @@
     "hddtemp" = ps: with ps; [ ];
     "hdmi_cec" = ps: with ps; [ pycec ];
     "heatmiser" = ps: with ps; [ ]; # missing inputs: heatmiserV3
-    "heos" = ps: with ps; [ ]; # missing inputs: pyheos
+    "heos" = ps: with ps; [ pyheos ];
     "here_travel_time" = ps: with ps; [ ]; # missing inputs: herepy
     "hikvision" = ps: with ps; [ ]; # missing inputs: pyhik
     "hikvisioncam" = ps: with ps; [ ]; # missing inputs: hikvision
@@ -352,7 +352,7 @@
     "history" = ps: with ps; [ aiohttp-cors sqlalchemy ];
     "history_stats" = ps: with ps; [ sqlalchemy ];
     "hitron_coda" = ps: with ps; [ ];
-    "hive" = ps: with ps; [ ]; # missing inputs: pyhiveapi
+    "hive" = ps: with ps; [ pyhiveapi ];
     "hlk_sw16" = ps: with ps; [ ]; # missing inputs: hlk-sw16
     "home_connect" = ps: with ps; [ aiohttp-cors homeconnect ];
     "home_plus_control" = ps: with ps; [ aiohttp-cors homepluscontrol ];
