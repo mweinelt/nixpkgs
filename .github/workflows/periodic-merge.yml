@@ -1,0 +1,50 @@
+name: "Periodic Merges"
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # Merge every 6 hours
+    - cron:  '*/6 * * * *'
+
+jobs:
+  periodic-merge:
+    if: github.repository_owner == 'mweinelt'
+    runs-on: ubuntu-latest
+    strategy:
+      # don't fail fast, so that all pairs are tried
+      fail-fast: false
+      # certain branches need to be merged in order, like master->staging-next->staging
+      # and configuring no parallelism ensures the order of pairs below.
+      max-parallel: 1
+      matrix:
+        pairs:
+          - from: master
+            into: staging-next
+          - from: staging-next
+            into: staging
+          - from: release-21.05
+            into: staging-21.05-next
+          - from: staging-21.05-next
+            into: staging-21.05
+          - from: master
+            into: haskell-updates
+    name: ${{ matrix.pairs.from }} → ${{ matrix.pairs.into }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: ${{ matrix.pairs.from }} → ${{ matrix.pairs.into }}
+        uses: devmasx/merge-branch@v1.3.1
+        with:
+          type: now
+          from_branch: ${{ matrix.pairs.from }}
+          target_branch: ${{ matrix.pairs.into }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment on failure
+        uses: peter-evans/create-or-update-comment@v1
+        if: ${{ failure() }}
+        with:
+          issue-number: 6
+          body: |
+            A periodic merge from `${{ matrix.pairs.from }}` into `${{ matrix.pairs.into }}` has [failed](https://github.com/NixOS/nixpkgs/actions/runs/${{ github.run_id }}).
+
