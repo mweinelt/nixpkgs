@@ -1,0 +1,11 @@
+{
+  "url": "https://github.com/evcc-io/evcc",
+  "rev": "cf8e9bb298ef9709b90f666e698f583a7740e935",
+  "date": "2022-09-29T09:50:08+02:00",
+  "path": "/nix/store/ghm65jrx1h4khcp9am872wbprc9qjxq4-evcc",
+  "sha256": "1ch679qfz8mp8ivj38vxw6kk9c5indp5v30maf9lj38nqw9k8dc9",
+  "fetchLFS": false,
+  "fetchSubmodules": false,
+  "deepClone": false,
+  "leaveDotGit": false
+}
