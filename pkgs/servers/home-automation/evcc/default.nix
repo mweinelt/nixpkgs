@@ -4,6 +4,7 @@
 , buildGo118Module
 , fetchFromGitHub
 , mockgen
+, nixosTests
 
 # updateScript
 , coreutils
@@ -125,6 +126,10 @@ buildGo118Module rec {
 
     nix-update -f ../../../../default.nix evcc --version "$latest"
   '';
+
+  passthru.tests = {
+    inherit (nixosTests) evcc;
+  };
 
   meta = with lib; {
     description = "EV Charge Controller";
