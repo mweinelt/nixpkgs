@@ -31,6 +31,12 @@ buildPythonPackage rec {
     pytestCheckHook
   ];
 
+  pytestFlagsArray = [
+    # avoid failure due to deprecation warning
+    # see https://github.com/aio-libs/aiomysql/issues/505 for example
+    "-p no:warnings"
+  ];
+
   meta = with lib; {
     homepage = "http://jinja.pocoo.org/";
     description = "Stand-alone template engine";
