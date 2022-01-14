@@ -52,6 +52,11 @@ in
         restartTriggers = [ config.environment.etc."sysctl.d/60-nixos.conf".source ];
       };
 
+    # Prevent system crash or privilege escalation via unvalidated
+    # memory access in certain ring buffer operations of eBPF programs
+    # (CVE-2021-4204).
+    boot.kernel.sysctl."kernel.unprivileged_bpf_disabled" = mkDefault 1;
+
     # Hide kernel pointers (e.g. in /proc/modules) for unprivileged
     # users as these make it easier to exploit kernel vulnerabilities.
     boot.kernel.sysctl."kernel.kptr_restrict" = mkDefault 1;
