@@ -28,6 +28,31 @@ in
         Configuration for url-bot-rs, see <link xlink:href="https://github.com/nuxeh/url-bot-rs#configuration-file-options"/>
         for supported values.
       '';
+      example = {
+        "foonet" = {
+          "network" = {
+            "name" = "foonet";
+            "enable" = true;
+          };
+          "connection" = {
+            "nickname" = "urlify";
+            "server" = "irc.example.com";
+            "port" = 6698;
+            "use_ssl" = true;
+          };
+        };
+      };
+    };
+
+    basicSettings = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Whether to use basic configuration options. Can be used to connect to a
+        single IRC network, using the basic connection options provided in this
+        module. If disabled, the full configuration can be provided via the
+        settings option, for one or more IRC networks.
+      '';
     };
 
     nickname = mkOption {
@@ -75,7 +100,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    services.url-bot-rs.settings = {
+    services.url-bot-rs.settings = mkIf cfg.basicSettings {
       connection = mapAttrs (name: mkDefault) {
         # These are the basic settings required to get the bot connected and joined.
         nickname = cfg.nickname;
