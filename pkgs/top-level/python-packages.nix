@@ -6944,6 +6944,8 @@ in {
 
   pydispatcher = callPackage ../development/python-modules/pydispatcher { };
 
+  pydle = callPackage ../development/python-modules/pydle { };
+
   pydmd = callPackage ../development/python-modules/pydmd { };
 
   pydns = callPackage ../development/python-modules/py3dns { };
