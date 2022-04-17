@@ -6668,6 +6668,8 @@ in {
 
   puremagic = callPackage ../development/python-modules/puremagic { };
 
+  pure-sasl = callPackage ../development/python-modules/pure-sasl { };
+
   purl = callPackage ../development/python-modules/purl { };
 
   push-receiver = callPackage ../development/python-modules/push-receiver { };
