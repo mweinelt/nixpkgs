@@ -295,10 +295,10 @@ buildStdenv.mkDerivation ({
     # Google API key used by Chromium and Firefox.
     # Note: These are for NixOS/nixpkgs use ONLY. For your own distribution,
     # please get your own set of keys.
-    echo "AIzaSyDGi15Zwl11UNe6Y-5XW_upsfyw31qwZPI" > $TMPDIR/ga
+    echo "AIzaSyDGi15Zwl11UNe6Y-5XW_upsfyw31qwZPI" > $TMPDIR/google-api-key
     # 60.5+ & 66+ did split the google API key arguments: https://bugzilla.mozilla.org/show_bug.cgi?id=1531176
-    configureFlagsArray+=("--with-google-location-service-api-keyfile=$TMPDIR/ga")
-    configureFlagsArray+=("--with-google-safebrowsing-api-keyfile=$TMPDIR/ga")
+    configureFlagsArray+=("--with-google-location-service-api-keyfile=$TMPDIR/google-api-key")
+    configureFlagsArray+=("--with-google-safebrowsing-api-keyfile=$TMPDIR/google-api-key")
   '' + lib.optionalString mlsAPISupport ''
     # Mozilla Location services API key
     # Note: These are for NixOS/nixpkgs use ONLY. For your own distribution,
