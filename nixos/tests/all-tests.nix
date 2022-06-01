@@ -514,6 +514,7 @@ in
   sssd-ldap = handleTestOn ["x86_64-linux"] ./sssd-ldap.nix {};
   starship = handleTest ./starship.nix {};
   step-ca = handleTestOn ["x86_64-linux"] ./step-ca.nix {};
+  strichliste = handleTest ./strichliste.nix {};
   strongswan-swanctl = handleTest ./strongswan-swanctl.nix {};
   sudo = handleTest ./sudo.nix {};
   sway = handleTest ./sway.nix {};
