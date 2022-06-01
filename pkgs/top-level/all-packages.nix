@@ -22644,6 +22644,8 @@ with pkgs;
 
   storm = callPackage ../servers/computing/storm { };
 
+  strichliste = callPackage ../servers/web-apps/strichliste { };
+
   switcheroo-control = callPackage ../os-specific/linux/switcheroo-control { };
 
   slurm = callPackage ../servers/computing/slurm { gtk2 = null; };
