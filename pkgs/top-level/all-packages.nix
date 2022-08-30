@@ -34172,6 +34172,8 @@ with pkgs;
 
   almonds = callPackage ../applications/science/math/almonds { };
 
+  accelerate = with python3Packages; toPythonApplication accelerate;
+
   adolc = callPackage ../applications/science/math/adolc { };
 
   amd-blis = callPackage ../development/libraries/science/math/amd-blis { };

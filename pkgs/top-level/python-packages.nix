@@ -158,6 +158,8 @@ in {
 
   absl-py = callPackage ../development/python-modules/absl-py { };
 
+  accelerate = callPackage ../development/python-modules/accelerate { };
+
   accuweather = callPackage ../development/python-modules/accuweather { };
 
   accupy = callPackage ../development/python-modules/accupy { };
