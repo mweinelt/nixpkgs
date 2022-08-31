@@ -10640,6 +10640,8 @@ in {
 
   tailscale = callPackage ../development/python-modules/tailscale { };
 
+  taming-transformers = callPackage ../development/python-modules/taming-transformers { };
+
   tank-utility = callPackage ../development/python-modules/tank-utility { };
 
   tappy = callPackage ../development/python-modules/tappy { };
