@@ -1881,6 +1881,8 @@ in {
 
   clintermission = callPackage ../development/python-modules/clintermission { };
 
+  clip = callPackage ../development/python-modules/clip { };
+
   clize = callPackage ../development/python-modules/clize { };
 
   clldutils = callPackage ../development/python-modules/clldutils { };
