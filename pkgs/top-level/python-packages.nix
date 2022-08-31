@@ -5719,6 +5719,8 @@ in {
 
   mockupdb = callPackage ../development/python-modules/mockupdb { };
 
+  modelcards = callPackage ../development/python-modules/modelcards { };
+
   modeled = callPackage ../development/python-modules/modeled { };
 
   moderngl = callPackage ../development/python-modules/moderngl { };
