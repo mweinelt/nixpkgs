@@ -4383,6 +4383,8 @@ self: super: with self; {
 
   elmax-api = callPackage ../development/python-modules/elmax-api { };
 
+  email-reply-parser = callPackage ../development/python-modules/email-reply-parser { };
+
   email-validator = callPackage ../development/python-modules/email-validator { };
 
   emailthreads = callPackage ../development/python-modules/emailthreads { };
