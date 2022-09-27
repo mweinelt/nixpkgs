@@ -3802,6 +3802,8 @@ self: super: with self; {
 
   django-pglocks = callPackage ../development/python-modules/django-pglocks { };
 
+  django-pg-zero-downtime-migrations = callPackage ../development/python-modules/django-pg-zero-downtime-migrations { };
+
   django-phonenumber-field = callPackage ../development/python-modules/django-phonenumber-field { };
 
   django-picklefield = callPackage ../development/python-modules/django-picklefield { };
