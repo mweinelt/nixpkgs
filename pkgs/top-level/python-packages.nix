@@ -5720,6 +5720,8 @@ self: super: with self; {
 
   google-cloud-firestore = callPackage ../development/python-modules/google-cloud-firestore { };
 
+  google-cloud-functions = callPackage ../development/python-modules/google-cloud-functions { };
+
   google-cloud-iam = callPackage ../development/python-modules/google-cloud-iam { };
 
   google-cloud-iam-logging = callPackage ../development/python-modules/google-cloud-iam-logging { };
