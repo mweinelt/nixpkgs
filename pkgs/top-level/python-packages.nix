@@ -14744,6 +14744,10 @@ self: super: with self; {
 
   razdel = callPackage ../development/python-modules/razdel { };
 
+  rb = callPackage ../development/python-modules/rb {
+    redis-server = pkgs.redis;
+  };
+
   rbtools = callPackage ../development/python-modules/rbtools { };
 
   rchitect = callPackage ../development/python-modules/rchitect { };
