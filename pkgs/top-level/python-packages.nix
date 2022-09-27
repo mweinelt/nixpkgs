@@ -10913,6 +10913,8 @@ self: super: with self; {
 
   pettingzoo = callPackage ../development/python-modules/pettingzoo { };
 
+  petname = callPackage ../development/python-modules/petname { };
+
   pex = callPackage ../development/python-modules/pex { };
 
   pexif = callPackage ../development/python-modules/pexif { };
