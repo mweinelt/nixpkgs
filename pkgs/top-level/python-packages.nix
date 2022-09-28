@@ -15579,6 +15579,8 @@ self: super: with self; {
 
   sentinels = callPackage ../development/python-modules/sentinels { };
 
+  sentry-arroyo = callPackage ../development/python-modules/sentry-arroyo { };
+
   sentry-sdk = sentry-sdk_1;
 
   sentry-sdk_1 = callPackage ../development/python-modules/sentry-sdk/1.nix { };
