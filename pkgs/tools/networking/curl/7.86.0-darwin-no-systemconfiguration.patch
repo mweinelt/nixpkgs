@@ -5,9 +5,11 @@ which requires it (NAT64).
 Patching actual configure script here as we also don't want to require
 autoconf in the bootstrap loop just to regenerate a patched configure.ac.
 
---- a/configure   2021-10-16 00:51:59.000000000 +0100
-+++ b/configure   2021-10-16 01:06:46.000000000 +0100
-@@ -20810,7 +20810,7 @@
+diff --git a/configure b/configure
+index fdad6a8..14cb03a 100755
+--- a/configure
++++ b/configure
+@@ -21154,7 +21154,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
      if test "x$build_for_macos" != xno; then
        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
  printf "%s\n" "yes" >&6; }
@@ -16,9 +18,9 @@ autoconf in the bootstrap loop just to regenerate a patched configure.ac.
      else
        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
  printf "%s\n" "no" >&6; }
-@@ -22211,9 +22211,6 @@
- fi
+@@ -22512,9 +22512,6 @@ fi
  
+ fi
  
 -if test "$HAVE_GETHOSTBYNAME" != "1"; then
 -  as_fn_error $? "couldn't find libraries for gethostbyname()" "$LINENO" 5
@@ -27,12 +29,12 @@ autoconf in the bootstrap loop just to regenerate a patched configure.ac.
  
  curl_includes_winsock2="\
 diff --git a/lib/curl_setup.h b/lib/curl_setup.h
-index 99048c489..19abfbbac 100644
+index ac27b13..7d966d4 100644
 --- a/lib/curl_setup.h
 +++ b/lib/curl_setup.h
-@@ -247,19 +247,6 @@
- #  include "setup-win32.h"
- #endif
+@@ -246,18 +246,6 @@
+ 
+ #include <curl/system.h>
  
 -/*
 - * Use getaddrinfo to resolve the IPv4 address literal. If the current network
@@ -46,7 +48,7 @@ index 99048c489..19abfbbac 100644
 -#    define CURL_OSX_CALL_COPYPROXIES 1
 -#  endif
 -#endif
--
+ 
  #ifdef USE_LWIPSOCK
  #  include <lwip/init.h>
- #  include <lwip/sockets.h>
+
