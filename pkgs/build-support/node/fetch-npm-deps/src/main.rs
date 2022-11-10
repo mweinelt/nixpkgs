@@ -31,18 +31,36 @@ struct OldPackage {
     dependencies: Option<HashMap<String, OldPackage>>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 struct Package {
     resolved: Option<Url>,
     integrity: Option<String>,
 }
 
+#[allow(clippy::case_sensitive_file_extension_comparisons)]
 fn to_new_packages(
     old_packages: HashMap<String, OldPackage>,
 ) -> anyhow::Result<HashMap<String, Package>> {
     let mut new = HashMap::new();
 
-    for (name, package) in old_packages {
+    for (name, mut package) in old_packages {
+        for (prefix, host) in [
+            ("github:", "github.com"),
+            ("bitbucket:", "bitbucket.org"),
+            ("gitlab:", "gitlab.com"),
+        ] {
+            if let Some(stripped) = package.version.strip_prefix(prefix) {
+                if let Some((repo, commit)) = stripped.split_once('#') {
+                    package.version = format!(
+                        "git+ssh://git@{host}/{repo}{}#{commit}",
+                        if repo.ends_with(".git") { "" } else { ".git" }
+                    );
+                }
+
+                break;
+            }
+        }
+
         new.insert(
             format!("{name}-{}", package.version),
             Package {
@@ -280,7 +298,8 @@ fn main() -> anyhow::Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::{get_hosted_git_url, get_ideal_hash};
+    use super::{get_hosted_git_url, get_ideal_hash, to_new_packages, OldPackage, Package};
+    use std::collections::HashMap;
     use url::Url;
 
     #[test]
@@ -330,5 +349,34 @@ mod tests {
         ] {
             assert_eq!(get_ideal_hash(input).ok(), expected);
         }
+    }
+
+    #[test]
+    fn git_shorthand_v1() -> anyhow::Result<()> {
+        let old = {
+            let mut o = HashMap::new();
+            o.insert(
+                String::from("sqlite3"),
+                OldPackage {
+                    version: String::from(
+                        "github:mapbox/node-sqlite3#593c9d498be2510d286349134537e3bf89401c4a",
+                    ),
+                    resolved: None,
+                    integrity: None,
+                    dependencies: None,
+                },
+            );
+            o
+        };
+
+        let new = to_new_packages(old)?;
+
+        assert_eq!(new.len(), 1, "new packages map should contain 1 value");
+        assert_eq!(new.into_values().next().unwrap(), Package {
+            resolved: Some(Url::parse("git+ssh://git@github.com/mapbox/node-sqlite3.git#593c9d498be2510d286349134537e3bf89401c4a").unwrap()),
+            integrity: None
+        });
+
+        Ok(())
     }
 }
