@@ -35,8 +35,27 @@ struct OldPackage {
 
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 struct Package {
-    resolved: Option<Url>,
+    resolved: Option<UrlOrString>,
     integrity: Option<String>,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[serde(untagged)]
+enum UrlOrString {
+    Url(Url),
+    String(String),
+}
+
+impl From<Url> for UrlOrString {
+    fn from(u: Url) -> UrlOrString {
+        UrlOrString::Url(u)
+    }
+}
+
+impl From<String> for UrlOrString {
+    fn from(s: String) -> UrlOrString {
+        UrlOrString::String(s)
+    }
 }
 
 #[allow(clippy::case_sensitive_file_extension_comparisons)]
@@ -71,9 +90,14 @@ fn to_new_packages(
             format!("{name}-{}", package.version),
             Package {
                 resolved: if let Ok(url) = Url::parse(&package.version) {
-                    Some(url)
+                    Some(url.into())
                 } else {
-                    package.resolved.as_deref().map(Url::parse).transpose()?
+                    package
+                        .resolved
+                        .as_deref()
+                        .map(Url::parse)
+                        .transpose()?
+                        .map(UrlOrString::from)
                 },
                 integrity: package.integrity,
             },
@@ -255,13 +279,23 @@ fn main() -> anyhow::Result<()> {
         .unwrap()
         .into_par_iter()
         .try_for_each(|(dep, package)| {
-            if dep.is_empty() || package.resolved.is_none() {
+            if dep.is_empty()
+                || package.resolved.is_none()
+                || package
+                    .resolved
+                    .as_ref()
+                    .map(|r| matches!(r, UrlOrString::String(_)))
+                    .unwrap_or_default()
+            {
                 return Ok::<_, anyhow::Error>(());
             }
 
             eprintln!("{dep}");
 
-            let mut resolved = package.resolved.unwrap();
+            let mut resolved = match package.resolved {
+                Some(UrlOrString::Url(url)) => url,
+                _ => unreachable!(),
+            };
 
             if let Some(hosted_git_url) = get_hosted_git_url(&resolved) {
                 resolved = hosted_git_url;
@@ -380,7 +414,7 @@ mod tests {
 
         assert_eq!(new.len(), 1, "new packages map should contain 1 value");
         assert_eq!(new.into_values().next().unwrap(), Package {
-            resolved: Some(Url::parse("git+ssh://git@github.com/mapbox/node-sqlite3.git#593c9d498be2510d286349134537e3bf89401c4a").unwrap()),
+            resolved: Some(Url::parse("git+ssh://git@github.com/mapbox/node-sqlite3.git#593c9d498be2510d286349134537e3bf89401c4a").unwrap().into()),
             integrity: None
         });
 
