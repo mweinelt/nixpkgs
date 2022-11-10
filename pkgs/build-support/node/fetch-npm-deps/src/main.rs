@@ -26,6 +26,8 @@ struct PackageLock {
 #[derive(Deserialize)]
 struct OldPackage {
     version: String,
+    #[serde(default)]
+    bundled: bool,
     resolved: Option<String>,
     integrity: Option<String>,
     dependencies: Option<HashMap<String, OldPackage>>,
@@ -44,6 +46,10 @@ fn to_new_packages(
     let mut new = HashMap::new();
 
     for (name, mut package) in old_packages {
+        if package.bundled {
+            continue;
+        }
+
         for (prefix, host) in [
             ("github:", "github.com"),
             ("bitbucket:", "bitbucket.org"),
@@ -361,6 +367,7 @@ mod tests {
                     version: String::from(
                         "github:mapbox/node-sqlite3#593c9d498be2510d286349134537e3bf89401c4a",
                     ),
+                    bundled: false,
                     resolved: None,
                     integrity: None,
                     dependencies: None,
