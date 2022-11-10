@@ -81,6 +81,18 @@
 
           hash = "sha256-oIM05TGHstX1D4k2K4TJ+SHB7H/tNKzxzssqf0GJwvY=";
         };
+
+        # This package contains both hosted Git shorthand, and a bundled dependency that happens to override an existing one.
+        etherpadLite1818 = makeTest {
+          name = "etherpad-lite-1.8.18";
+
+          src = fetchurl {
+            url = "https://raw.githubusercontent.com/ether/etherpad-lite/1.8.18/src/package-lock.json";
+            hash = "sha256-1fGNxYJi1I4cXK/jinNG+Y6tPEOhP3QAqWOBEQttS9E=";
+          };
+
+          hash = "sha256-TzUFykASDjXlfmgq2bUIJjUkfLlGLUkRTVFPIYPCmyc=";
+        };
       };
 
     meta = with lib; {
