@@ -37,7 +37,7 @@
 
 buildPythonPackage rec {
   pname = "sphinx";
-  version = "5.3.0";
+  version = "6.0.0";
   format = "pyproject";
 
   disabled = pythonOlder "3.6";
@@ -46,7 +46,7 @@ buildPythonPackage rec {
     owner = "sphinx-doc";
     repo = pname;
     rev = "refs/tags/v${version}";
-    hash = "sha256-80bVg1rfBebgSOKbWkzP84vpm39iLgM8lWlVD64nSsQ=";
+    hash = "sha256-m3K2ECIGokD7mS3plMhYUmJlvVU3U6C7VP6G4AqRrhA=";
     postFetch = ''
       cd $out
       mv tests/roots/test-images/testimäge.png \
