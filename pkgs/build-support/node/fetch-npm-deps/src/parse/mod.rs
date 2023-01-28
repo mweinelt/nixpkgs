@@ -99,7 +99,7 @@ impl Package {
             UrlOrString::String(_) => panic!("at this point, all packages should have URLs"),
         };
 
-        let specifics = match get_hosted_git_url(&resolved) {
+        let specifics = match get_hosted_git_url(&resolved)? {
             Some(hosted) => {
                 let mut body = ureq::get(hosted.as_str()).call()?.into_reader();
 
@@ -188,11 +188,13 @@ impl Package {
 }
 
 #[allow(clippy::case_sensitive_file_extension_comparisons)]
-fn get_hosted_git_url(url: &Url) -> Option<Url> {
-    if ["git", "http", "git+ssh", "git+https", "ssh", "https"].contains(&url.scheme()) {
-        let mut s = url.path_segments()?;
+fn get_hosted_git_url(url: &Url) -> anyhow::Result<Option<Url>> {
+    if ["git", "git+ssh", "git+https", "ssh"].contains(&url.scheme()) {
+        let mut s = url
+            .path_segments()
+            .ok_or_else(|| anyhow!("bad URL: {url}"))?;
 
-        match url.host_str()? {
+        let mut get_url = || match url.host_str()? {
             "github.com" => {
                 let user = s.next()?;
                 let mut project = s.next()?;
@@ -241,7 +243,7 @@ fn get_hosted_git_url(url: &Url) -> Option<Url> {
                 )
             }
             "gitlab.com" => {
-                let path = &url.path()[1..];
+                /* let path = &url.path()[1..];
 
                 if path.contains("/~/") || path.contains("/archive.tar.gz") {
                     return None;
@@ -261,7 +263,10 @@ fn get_hosted_git_url(url: &Url) -> Option<Url> {
                     "https://gitlab.com/{user}/{project}/repository/archive.tar.gz?ref={commit}"
                 ))
                     .ok()?,
-                )
+                ) */
+
+                // lmao: https://github.com/npm/hosted-git-info/pull/109
+                None
             }
             "git.sr.ht" => {
                 let user = s.next()?;
@@ -286,9 +291,14 @@ fn get_hosted_git_url(url: &Url) -> Option<Url> {
                 )
             }
             _ => None,
+        };
+
+        match get_url() {
+            Some(u) => Ok(Some(u)),
+            None => Err(anyhow!("This lockfile either contains a Git dependency with an unsupported host, or a malformed URL in the lockfile: {url}"))
         }
     } else {
-        None
+        Ok(None)
     }
 }
 
@@ -321,20 +331,8 @@ mod tests {
                 Some("https://codeload.github.com/castlabs/electron-releases/tar.gz/fc5f78d046e8d7cdeb66345a2633c383ab41f525"),
             ),
             (
-                "https://user@github.com/foo/bar#fix/bug",
-                Some("https://codeload.github.com/foo/bar/tar.gz/fix/bug")
-            ),
-            (
-                "https://github.com/eligrey/classList.js/archive/1.2.20180112.tar.gz",
-                None
-            ),
-            (
                 "git+ssh://bitbucket.org/foo/bar#branch",
                 Some("https://bitbucket.org/foo/bar/get/branch.tar.gz")
-            ),
-            (
-                "ssh://git@gitlab.com/foo/bar.git#fix/bug",
-                Some("https://gitlab.com/foo/bar/repository/archive.tar.gz?ref=fix/bug")
             ),
             (
                 "git+ssh://git.sr.ht/~foo/bar#branch",
@@ -342,10 +340,16 @@ mod tests {
             ),
         ] {
             assert_eq!(
-                get_hosted_git_url(&Url::parse(input).unwrap()),
+                get_hosted_git_url(&Url::parse(input).unwrap()).unwrap(),
                 expected.map(|u| Url::parse(u).unwrap())
             );
         }
+
+        assert!(
+            get_hosted_git_url(&Url::parse("ssh://git@gitlab.com/foo/bar.git#fix/bug").unwrap())
+                .is_err(),
+            "GitLab URLs should be marked as invalid (lol)"
+        );
     }
 
     #[test]
