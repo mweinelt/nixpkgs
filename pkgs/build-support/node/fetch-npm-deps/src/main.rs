@@ -1,10 +1,11 @@
 #![warn(clippy::pedantic)]
 
-use crate::cacache::Cache;
+use crate::{cacache::Cache, parse::lock::HashCollection};
 use anyhow::anyhow;
 use rayon::prelude::*;
 use serde_json::{Map, Value};
 use std::{
+    collections::{HashMap, HashSet},
     env, fs,
     path::Path,
     process::{self, Command},
@@ -34,6 +35,8 @@ fn fixup_lockfile(mut lock: Map<String, Value>) -> anyhow::Result<Option<Map<Str
 
     let mut fixed = false;
 
+    let mut hashes: HashMap<_, HashSet<_>> = HashMap::new();
+
     for package in lock
         .get_mut("packages")
         .ok_or_else(|| anyhow!("couldn't get packages"))?
@@ -42,13 +45,50 @@ fn fixup_lockfile(mut lock: Map<String, Value>) -> anyhow::Result<Option<Map<Str
         .values_mut()
     {
         if let Some(Value::String(resolved)) = package.get("resolved") {
-            if resolved.starts_with("git+ssh://") && package.get("integrity").is_some() {
-                fixed = true;
+            if let Some(Value::String(integrity)) = package.get("integrity") {
+                (*hashes.entry(resolved.clone()).or_default())
+                    .insert(HashCollection::from_str(integrity)?.into_best().unwrap());
 
-                package
-                    .as_object_mut()
-                    .ok_or_else(|| anyhow!("package isn't a map"))?
-                    .remove("integrity");
+                if resolved.starts_with("git+ssh://") {
+                    fixed = true;
+
+                    package
+                        .as_object_mut()
+                        .ok_or_else(|| anyhow!("package isn't a map"))?
+                        .remove("integrity");
+                }
+            }
+        }
+    }
+
+    for package in lock
+        .get_mut("packages")
+        .ok_or_else(|| anyhow!("couldn't get packages"))?
+        .as_object_mut()
+        .ok_or_else(|| anyhow!("packages isn't a map"))?
+        .values_mut()
+    {
+        if let Some(Value::String(resolved)) = package.get("resolved") {
+            if let Some(Value::String(integrity)) = package.get("integrity") {
+                if let Some(hs) = hashes.get(resolved) {
+                    if hs.len() == 1 {
+                        continue;
+                    }
+
+                    let collection = HashCollection::from_str(integrity)?;
+
+                    let best = hs.iter().max();
+
+                    if collection.into_best().as_ref() == best {
+                        continue;
+                    }
+
+                    fixed = true;
+
+                    if let Some(Value::String(i)) = package.get_mut("integrity") {
+                        *i = best.unwrap().as_str().to_string();
+                    }
+                }
             }
         }
     }
@@ -147,12 +187,20 @@ mod tests {
                 },
                 "foo": {
                     "resolved": "https://github.com/NixOS/nixpkgs",
-                    "integrity": "aaa"
+                    "integrity": "sha1-aaa"
                 },
                 "bar": {
                     "resolved": "git+ssh://git@github.com/NixOS/nixpkgs.git",
-                    "integrity": "bbb"
-                }
+                    "integrity": "sha512-aaa"
+                },
+                "foo-bad": {
+                    "resolved": "foo",
+                    "integrity": "sha1-foo"
+                },
+                "foo-good": {
+                    "resolved": "foo",
+                    "integrity": "sha512-foo"
+                },
             }
         });
 
@@ -165,11 +213,19 @@ mod tests {
                 },
                 "foo": {
                     "resolved": "https://github.com/NixOS/nixpkgs",
-                    "integrity": "aaa"
+                    "integrity": "sha1-aaa"
                 },
                 "bar": {
                     "resolved": "git+ssh://git@github.com/NixOS/nixpkgs.git",
-                }
+                },
+                "foo-bad": {
+                    "resolved": "foo",
+                    "integrity": "sha512-foo"
+                },
+                "foo-good": {
+                    "resolved": "foo",
+                    "integrity": "sha512-foo"
+                },
             }
         });
 
