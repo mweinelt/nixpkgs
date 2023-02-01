@@ -14,13 +14,13 @@
 
 let
 
-  version = "0.48.0";
+  version = "0.49.0";
 
   src = fetchFromGitHub {
     owner = "navidrome";
     repo = "navidrome";
     rev = "v${version}";
-    hash = "sha256-FO2Vl3LeajvZ8CLtnsOSLXr//gaOWPbMthj70RHxp+Q=";
+    hash = "sha256-FC9nesnyRnhg5+aDOwEAgD4q672smJFDPqwGZipBe1c=";
   };
 
   ui = callPackage ./ui {
@@ -35,7 +35,7 @@ buildGoModule {
 
   inherit src version;
 
-  vendorSha256 = "sha256-LPoM5RFHfTTWZtlxc59hly12zzrY8wjXGZ6xW2teOFM=";
+  vendorSha256 = "sha256-afIRr9aKzMKRrkH9nUDXE4HEcShjPj8W5rpf94nE6Rg=";
 
   nativeBuildInputs = [ makeWrapper pkg-config ];
 

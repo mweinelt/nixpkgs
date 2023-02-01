@@ -1,27 +1,21 @@
-{ buildPackages, nodejs, stdenv, src, version }:
+{ buildNpmPackage
+, nodejs
+, src
+, version
+}:
 
-let
-
-  nodeComposition = import ./node-composition.nix {
-    inherit (buildPackages) nodejs;
-    inherit (stdenv.hostPlatform) system;
-    pkgs = buildPackages;
-  };
-
-in
-
-nodeComposition.package.override {
-
-  pname = "navidrome";
+buildNpmPackage {
+  pname = "navidrome-ui";
   inherit version;
+
   src = "${src}/ui";
 
-  dontNpmInstall = true;
+  npmDepsHash = "sha256-QpNvMsALcDcMJOdY7e4YLZvHabSFjWve9C9UFDMOoYU=";
 
-  postInstall = ''
-    npm run build
-    cd $out
-    mv lib/node_modules/navidrome-ui/build/* .
-    rm -rf lib
+  installPhase = ''
+    runHook preInstall
+    mkdir $out
+    cp -rv ./build/* $out/
+    runHook postInstall
   '';
 }
