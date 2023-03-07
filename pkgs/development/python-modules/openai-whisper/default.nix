@@ -7,12 +7,14 @@
 , ffmpeg
 
 # propagates
+, ffmpeg-python
+, more-itertools
+, numba
 , numpy
 , torch
 , tqdm
-, more-itertools
 , transformers
-, ffmpeg-python
+, triton
 
 # tests
 , pytestCheckHook
@@ -20,14 +22,14 @@
 
 buildPythonPackage rec {
   pname = "whisper";
-  version = "20230124";
+  version = "20230306";
   format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "openai";
     repo = pname;
     rev = "refs/tags/v${version}";
-    hash = "sha256-+3fs/EXK5NGlISuMTk7r2ZZ4tNFKbNFNkVS2LmHBvwk=";
+    hash = "sha256-j1X4e1mZnSWxZT1bdxt72mrZZlQGxjoxabJi3SdGrUY=";
   };
 
   patches = [
@@ -38,12 +40,14 @@ buildPythonPackage rec {
   ];
 
   propagatedBuildInputs = [
+    ffmpeg-python
+    more-itertools
+    numba
     numpy
     torch
     tqdm
-    more-itertools
     transformers
-    ffmpeg-python
+    triton
   ];
 
   preCheck = ''
