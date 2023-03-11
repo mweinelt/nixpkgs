@@ -41,6 +41,9 @@ let
       # This should be made configurable.
       #CHFN_RESTRICT frwh
 
+      # Rely on yescrypt for new shadow password hashes
+      ENCRYPT_METHOD YESCRYPT
+
     '';
 
   mkSetuidRoot = source:
