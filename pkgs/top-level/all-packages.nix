@@ -300,6 +300,8 @@ with pkgs;
 
   asn1c = callPackage ../development/compilers/asn1c { };
 
+  authentik = callPackage ../servers/security/authentik { };
+
   authy = callPackage ../applications/misc/authy { };
 
   authz0 = callPackage ../tools/security/authz0 { };
