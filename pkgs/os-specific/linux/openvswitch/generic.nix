@@ -45,6 +45,10 @@ in stdenv.mkDerivation rec {
     ./patches/disable-bash-arg-completion-test.patch
   ];
 
+  postPatch = ''
+    patchShebangs tests/test-*.py
+  '';
+
   nativeBuildInputs = [
     autoconf
     automake
