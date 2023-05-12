@@ -232,6 +232,9 @@ in {
        else ./use-etc-ssl-certs.patch)
     ];
     withDocs = true;
+    extraMeta = {
+      knownVulnerabilities = [ "eol" ];
+    };
   };
 
   openssl_3 = common {
