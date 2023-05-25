@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, fetchpatch, python3Packages, zlib, pkg-config, glib, buildPackages
+{ lib, stdenv, fetchurl, fetchpatch, python3Packages, perl, zlib, pkg-config, glib, buildPackages
 , pixman, vde2, alsa-lib, texinfo, flex
 , bison, lzo, snappy, libaio, libtasn1, gnutls, nettle, curl, ninja, meson, sigtool
 , makeWrapper, runtimeShell, removeReferencesTo
@@ -67,7 +67,8 @@ stdenv.mkDerivation rec {
   ]
     ++ lib.optionals gtkSupport [ wrapGAppsHook ]
     ++ lib.optionals hexagonSupport [ glib ]
-    ++ lib.optionals stdenv.isDarwin [ sigtool ];
+    ++ lib.optionals stdenv.isDarwin [ sigtool ]
+    ++ lib.optionals (lib.versionOlder version "7.2.1") [ perl ];
 
   buildInputs = [ zlib glib pixman
     vde2 texinfo lzo snappy libtasn1
@@ -138,7 +139,7 @@ stdenv.mkDerivation rec {
   preConfigure = ''
     unset CPP # intereferes with dependency calculation
     # this script isn't marked as executable b/c it's indirectly used by meson. Needed to patch its shebang
-    chmod +x ./scripts/shaderinclude.py
+    chmod +x ./scripts/shaderinclude.{py,pl} || true
     patchShebangs .
     # avoid conflicts with libc++ include for <version>
     mv VERSION QEMU_VERSION
