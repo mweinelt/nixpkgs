@@ -12,6 +12,8 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ flex bison ];
   buildInputs = [ readline libssh ];
 
+  enableParallelBuilding = true;
+
   patches = [
     ./dont-create-sysconfdir-2.patch
   ];
