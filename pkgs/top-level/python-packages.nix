@@ -7731,6 +7731,10 @@ self: super: with self; {
 
   pipenv-poetry-migrate = callPackage ../development/python-modules/pipenv-poetry-migrate { };
 
+  piper-phonmize = callPackage ../development/python-modules/piper-phonemize {
+    piper-phonemize-native = pkgs.piper-phonemize;
+  };
+
   piper-train = callPackage ../development/python-modules/piper-train { };
 
   pip-api = callPackage ../development/python-modules/pip-api { };

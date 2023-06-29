@@ -49,6 +49,10 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+  passthru = {
+    espeak-ng = espeak-ng';
+  };
+
   meta = with lib; {
     description = "C++ library for converting text to phonemes for Piper";
     homepage = "https://github.com/rhasspy/piper-phonemize";
