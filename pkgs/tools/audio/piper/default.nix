@@ -1,17 +1,24 @@
 { lib
 , stdenv
 , fetchFromGitHub
+
+# build time
 , cmake
 , pkg-config
-, espeak-ng
+
+# runtime
 , onnxruntime
 , pcaudiolib
+, piper-phonemize
+, spdlog
+
+# tests
 , piper-train
 }:
 
 let
   pname = "piper";
-  version = "0.0.2";
+  version = "1.0.0";
 in
 stdenv.mkDerivation {
   inherit pname version;
@@ -19,16 +26,11 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "rhasspy";
     repo = "piper";
-    rev = "70afec58bc131010c8993c154ff02a78d1e7b8b0";
-    hash = "sha256-zTW7RGcV8Hh7G6Braf27F/8s7nNjAqagp7tmrKO10BY=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-4RcbKC3O4mnOEi7L4y5F384DTKp0jUplrM97Q708G18=";
   };
 
   sourceRoot = "source/src/cpp";
-
-  postPatch = ''
-    substituteInPlace CMakeLists.txt \
-      --replace "/usr/local/include/onnxruntime" "${onnxruntime}"
-  '';
 
   nativeBuildInputs = [
     cmake
@@ -36,9 +38,11 @@ stdenv.mkDerivation {
   ];
 
   buildInputs = [
-    espeak-ng
     onnxruntime
     pcaudiolib
+    piper-phonemize
+    piper-phonemize.espeak-ng
+    spdlog
   ];
 
   installPhase = ''
