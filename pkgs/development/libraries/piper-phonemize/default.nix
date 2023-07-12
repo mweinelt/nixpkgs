@@ -1,9 +1,14 @@
 { lib
 , stdenv
 , fetchFromGitHub
+
+# build
 , cmake
 , pkg-config
+
+# runtime
 , espeak-ng
+, onnxruntime
 }:
 
 let
@@ -28,9 +33,14 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "rhasspy";
     repo = "piper-phonemize";
-    rev = "v${version}";
-    hash = "sha256-/uprYRLbf5qPOBdAN+bvRwxrGyChhDb2ZjS5gZMr/b8=";
+    rev = "15a25303fd856c67ae4ae774b04c116eead42ec1";
+    hash = "sha256-tu3t+wShCoL1Ajnnzpsi1i1jHGxaqxa9a9+Uo8IPHAw=";
   };
+
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   nativeBuildInputs = [
     cmake
@@ -39,13 +49,18 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     espeak-ng'
+    onnxruntime
   ];
 
-  installPhase = ''
+  ainstallPhase = ''
     runHook preInstall
-    find . -iname "libpiper_phonemize.so"
-    install -m0755 -d $out/lib
-    install -m0664 ./libpiper_phonemize.so $out/lib
+    
+    install -d $out/lib
+    install ./libpiper_phonemize.so $out/lib
+
+    install -d $dev/include/piper_phonemize
+    install -D ../src/*.hpp $dev/include
+    
     runHook postInstall
   '';
 
