@@ -390,6 +390,13 @@ in mkLicense lset) ({
     fullName = "Common Public License 1.0";
   };
 
+  csl = {
+    fullName = "Cooperative Software License";
+    url = "https://gitlab.com/cal-coop/cooperative-software-license";
+    free = false;
+    redistributable = true;
+  };
+
   curl = {
     spdxId = "curl";
     fullName = "curl License";
