@@ -10220,6 +10220,8 @@ with pkgs;
     matrix-sdk-crypto-nodejs = matrix-sdk-crypto-nodejs-0_1_0-beta_3;
   };
 
+  draupnir = callPackage ../servers/draupnir {};
+
   mmutils = callPackage ../tools/X11/mmutils { };
 
   mmv = callPackage ../tools/misc/mmv { };
