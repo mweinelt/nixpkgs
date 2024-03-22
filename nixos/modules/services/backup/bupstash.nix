@@ -79,7 +79,6 @@ let
         description = "Hook that runs before the ${name} bupstash backup.";
 
         partOf = [ "bupstash-${name}.target" ];
-        wantedBy = [ "bupstash-${name}.target" ];
 
         script = job.preHook;
 
@@ -96,7 +95,6 @@ let
         description = "Hook that runs after the ${name} bupstash backup.";
 
         partOf = [ "bupstash-${name}.target" ];
-        wantedBy = [ "bupstash-${name}.target" ];
 
         # Require the preHook Unit, so that in case of failure it does not try to run
         requires = optional (job.preHook != "") "bupstash-${name}-prehook.service";
@@ -139,6 +137,11 @@ let
 
           after = optional (job.preHook != "") "bupstash-${name}-prehook.service";
           before = optional (job.postHook != "" || job.preHook != "") "bupstash-${name}-posthook.service";
+
+          wants = [
+            "bupstash-${name}-prehook.service"
+            "bupstash-${name}-posthook.service"
+          ];
 
           partOf = [ "bupstash-${name}.target" ];
           wantedBy = [ "bupstash-${name}.target" ];
