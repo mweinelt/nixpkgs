@@ -66,6 +66,9 @@ def test_requirement(requirement: Requirement) -> bool:
     be resolved in the local environment, and whether it satisfies the
     specified version constraints.
     """
+    print("requirement", type(requirement), requirement)
+    print("specifier", bool(requirement.specifier), type(requirement.specifier), requirement.specifier)
+
     if requirement.marker and not requirement.marker.evaluate():
         # ignore requirements with incompatible markers
         return True
@@ -78,7 +81,7 @@ def test_requirement(requirement: Requirement) -> bool:
         error(f"{package_name} not installed")
         return False
 
-    if package.version not in requirement.specifier:
+    if requirement.specifier and package.version not in requirement.specifier:
         error(
             f"{package_name}{requirement.specifier} not satisfied by version {package.version}"
         )
