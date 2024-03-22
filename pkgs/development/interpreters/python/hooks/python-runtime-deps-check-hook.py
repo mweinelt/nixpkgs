@@ -78,6 +78,8 @@ def test_requirement(requirement: Requirement) -> bool:
         error(f"{package_name} not installed")
         return False
 
+    print("specifier", requirement.specifier._specs, bool(requirement.specifier))
+
     if package.version not in requirement.specifier:
         error(
             f"{package_name}{requirement.specifier} not satisfied by version {package.version}"
