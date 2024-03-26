@@ -238,7 +238,7 @@ let
       # hook tries to call `../node_modules/.bin/patch-package`, which
       # hasn't been `patchShebangs`-ed yet. So instead we just use
       # `patch-package` from `nativeBuildInputs`.
-      ./asserts_patch-package_from_path.patch
+      ./assets_patch-package_from_path.patch
     ];
 
     # We have to set up an environment that is close enough to
@@ -253,7 +253,7 @@ let
       yarn config --offline set yarn-offline-mirror $yarnOfflineCache
 
       # Fixup "resolved"-entries in yarn.lock to match our offline cache
-      fixup-yarn-lock app/assets/javascripts/yarn.lock
+      fixup-yarn-lock yarn.lock
 
       export SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt
 

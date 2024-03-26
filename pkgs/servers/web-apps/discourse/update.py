@@ -87,7 +87,7 @@ class DiscourseRepo:
         return self._latest_commit_sha
 
     def get_yarn_lock_hash(self, rev: str):
-        yarnLockText = self.get_file('app/assets/javascripts/yarn.lock', rev)
+        yarnLockText = self.get_file('yarn.lock', rev)
         with tempfile.NamedTemporaryFile(mode='w') as lockFile:
             lockFile.write(yarnLockText)
             return subprocess.check_output(['prefetch-yarn-deps', lockFile.name]).decode('utf-8').strip()
@@ -224,6 +224,8 @@ def update(rev):
         with open(rubyenv_dir / fn, 'w') as f:
             f.write(repo.get_file(fn, version.tag))
 
+    # work around https://github.com/nix-community/bundix/issues/8
+    os.environ["BUNDLE_FORCE_RUBY_PLATFORM"] = "true"
     subprocess.check_output(['bundle', 'lock'], cwd=rubyenv_dir)
     _remove_platforms(rubyenv_dir)
     subprocess.check_output(['bundix'], cwd=rubyenv_dir)
