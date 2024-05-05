@@ -202,7 +202,7 @@ let
 
     yarnOfflineCache = fetchYarnDeps {
       yarnLock = src + "/app/assets/javascripts/yarn.lock";
-      sha256 = "0vgrvj0jvgbg4s5ry3qh4pn4pa5km5yj4kmxj3wpg5qnbzcirkyj";
+      sha256 = "sha256-ZBXvNdHHV92kSAswe6KA+OqaY5smf7ZKTTOiY8g78D0=";
     };
 
     nativeBuildInputs = runtimeDeps ++ [
@@ -240,6 +240,10 @@ let
       # `patch-package` from `nativeBuildInputs`.
       ./assets_patch-package_from_path.patch
     ];
+
+    postPatch = ''
+      cp ${./yarn.lock} yarn.lock
+    '';
 
     # We have to set up an environment that is close enough to
     # production ready or the assets:precompile task refuses to
@@ -363,6 +367,8 @@ let
         sed -Ei "s,(\.\./)+(lib|app)/,$out/share/discourse/\2/," {} \;
       find config -maxdepth 1 -type f -name "*.rb" -execdir \
         sed -Ei "s,require_relative (\"|')([[:alnum:]].*)(\"|'),require_relative '$out/share/discourse/config/\2'," {} \;
+
+      cp ${./yarn.lock} yarn.lock
     '';
 
     buildPhase = ''
