@@ -87,7 +87,7 @@ class DiscourseRepo:
         return self._latest_commit_sha
 
     def get_yarn_lock_hash(self, rev: str):
-        yarnLockText = self.get_file('yarn.lock', rev)
+        yarnLockText = self.get_file('app/assets/javascripts/yarn-ember5.lock', rev)
         with tempfile.NamedTemporaryFile(mode='w') as lockFile:
             lockFile.write(yarnLockText)
             return subprocess.check_output(['prefetch-yarn-deps', lockFile.name]).decode('utf-8').strip()
