@@ -13,12 +13,17 @@ buildNpmPackage {
     substituteInPlace package.json \
       --replace-fail "--base=/BASE_PATH/" ""
 
-    substituteInPlace src/routes/Storage.jsx \
+    substituteInPlace \
+      src/pages/Exports.tsx \
+      src/components/card/{Export,Review}Card.tsx \
+      src/components/player/PreviewThumbnailPlayer.tsx \
+      src/components/timeline/EventSegment.tsx \
+      src/views/system/StorageMetrics.tsx \
       --replace-fail "/media/frigate" "/var/lib/frigate" \
-      --replace-fail "/tmp/cache" "/var/cache/frigate"
+      --replace-quiet "/tmp/cache" "/var/cache/frigate"
   '';
 
-  npmDepsHash = "sha256-+36quezGArqIM9dM+UihwcIgmE3EVmJQThuicLgDW4A=";
+  npmDepsHash = "sha256-gr4bh5FMjYu6/ejfrMShlApBdN4mZKBgtBbNHi/spKU=";
 
   installPhase = ''
     cp -rv dist/ $out

@@ -3,20 +3,19 @@
 , python311
 , fetchFromGitHub
 , fetchurl
-, fetchpatch2
 , frigate
 , nixosTests
 }:
 
 let
-  version = "0.13.2";
+  version = "0.14.0";
 
   src = fetchFromGitHub {
     #name = "frigate-${version}-source";
     owner = "blakeblackshear";
     repo = "frigate";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-NVT7yaJkVA7b7GL0S0fHjNneBzhjCru56qY1Q4sTVcE=";
+    rev = "188a7de467ca378136ecadc71cbcee2a7226a045";
+    hash = "sha256-bariT1dMkSVfkq712LtTG0SevDxwi1dSzMtQpnB5pe0=";
   };
 
   frigate-web = callPackage ./web.nix {
@@ -25,12 +24,6 @@ let
 
   python = python311.override {
     packageOverrides = self: super: {
-      pydantic = super.pydantic_1;
-
-      versioningit = super.versioningit.overridePythonAttrs {
-        # checkPhase requires pydantic>=2
-        doCheck = false;
-      };
     };
   };
 
@@ -60,23 +53,6 @@ python.pkgs.buildPythonApplication rec {
   inherit src;
 
   patches = [
-    (fetchpatch2 {
-      name = "frigate-flask3.0-compat.patch";
-      url = "https://github.com/blakeblackshear/frigate/commit/56bdacc1c661eff8a323e033520e75e2ba0a3842.patch";
-      hash = "sha256-s/goUJxIbjq/woCEOEZECdcZoJDoWc1eM63sd60cxeY=";
-    })
-    (fetchpatch2 {
-      # https://github.com/blakeblackshear/frigate/pull/10967
-      name = "frigate-wsdl-path.patch";
-      url = "https://github.com/blakeblackshear/frigate/commit/b65656fa8733c1c2f3d944f716d2e9493ae7c99f.patch";
-      hash = "sha256-taPWFV4PldBGUKAwFMKag4W/3TLMSGdKLYG8bj1Y5mU=";
-    })
-    (fetchpatch2 {
-      # https://github.com/blakeblackshear/frigate/pull/10097
-      name = "frigate-secrets-permissionerror.patch";
-      url = "https://github.com/blakeblackshear/frigate/commit/a1424bad6c0163e790129ade7a9784514d0bf89d.patch";
-      hash = "sha256-/kIy4aW9o5AKHJQfCDVY46si+DKaUb+CsZsCGIbXvUQ=";
-    })
     # https://github.com/blakeblackshear/frigate/pull/12324
     ./mpl-3.9.0.patch
   ];
@@ -93,10 +69,7 @@ python.pkgs.buildPythonApplication rec {
       --replace "/config" "/var/lib/frigate" \
       --replace "{CONFIG_DIR}/model_cache" "/var/cache/frigate/model_cache"
 
-    substituteInPlace frigate/http.py \
-      --replace "/opt/frigate" "${placeholder "out"}/${python.sitePackages}"
-
-    substituteInPlace frigate/output.py \
+    substituteInPlace frigate/{api/media.py,output/birdseye.py} \
       --replace "/opt/frigate" "${placeholder "out"}/${python.sitePackages}"
 
     substituteInPlace frigate/detectors/detector_config.py \
@@ -119,7 +92,9 @@ python.pkgs.buildPythonApplication rec {
     # docker/main/requirements-wheel.txt
     click
     flask
+    flask-limiter
     imutils
+    joserfc
     markupsafe
     matplotlib
     norfair
@@ -128,6 +103,7 @@ python.pkgs.buildPythonApplication rec {
     opencv4
     openvino
     paho-mqtt
+    pandas
     peewee
     peewee-migrate
     psutil
@@ -135,14 +111,16 @@ python.pkgs.buildPythonApplication rec {
     pydantic
     pytz
     pyyaml
+    pyzmq
     requests
     ruamel-yaml
     scipy
     setproctitle
-    tensorflow
     tzlocal
     unidecode
     ws4py
+    # docker/main/requirements-ov.txt
+    tensorflow
   ];
 
   installPhase = ''
