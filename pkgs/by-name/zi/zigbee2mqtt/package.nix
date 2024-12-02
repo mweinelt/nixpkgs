@@ -1,31 +1,53 @@
 { lib
 , stdenv
-, buildNpmPackage
 , fetchFromGitHub
+, nodejs
+, npmHooks
+, pnpm
 , systemdMinimal
 , nixosTests
 , nix-update-script
 , withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemdMinimal
 }:
 
-buildNpmPackage rec {
+stdenv.mkDerivation rec {
   pname = "zigbee2mqtt";
-  version = "1.42.0";
+  version = "2.0";
 
   src = fetchFromGitHub {
     owner = "Koenkk";
     repo = "zigbee2mqtt";
-    rev = version;
-    hash = "sha256-/7mZrf3FyIliCzsy6yzVRJYMy4bViphYi81UY43iO98=";
+    rev = "dev";
+    hash = "sha256-PUJYu0OslhIth6h3Y6r3ocQrMpsFxqBoCRVuXWoCxGo=";
   };
 
-  npmDepsHash = "sha256-heqTYLC+TQPQ2dc5MrVdvJeNqrygC4tUgkLcfKvlYvE=";
+  pnpmDeps = pnpm.fetchDeps {
+    inherit pname version src;
+    hash = "sha256-6CXTE4LOdRZOxRq6hpVzdWPOifj59jyhZNfW7bUdlyc=";
+  };
+
+  nativeBuildInputs = [
+    nodejs
+    npmHooks.npmBuildHook
+    npmHooks.npmInstallHook
+    pnpm.configHook
+  ];
+
+  npmBuildScript = "build";
+  npmBuildFlags = lib.optionals (!withSystemd) [ "--omit=optional" ];
 
   buildInputs = lib.optionals withSystemd [
     systemdMinimal
   ];
 
-  npmFlags = lib.optionals (!withSystemd) [ "--omit=optional" ];
+  #env.dontNpmPrune = true;
+  preInstall = ''
+    set -x
+  '';
+
+  postInstall = ''
+    set x
+  '';
 
   passthru.tests.zigbee2mqtt = nixosTests.zigbee2mqtt;
   passthru.updateScript = nix-update-script { };
