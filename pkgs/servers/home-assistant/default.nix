@@ -4,6 +4,7 @@
   callPackage,
   fetchFromGitHub,
   fetchPypi,
+  fetchpatch2,
   python312,
   substituteAll,
   ffmpeg-headless,
@@ -533,7 +534,12 @@ python.pkgs.buildPythonApplication rec {
       ffmpeg = "${lib.getExe ffmpeg-headless}";
     })
 
-    ./patches/watchdog5-compat.patch
+    (fetchpatch2 {
+      # https://github.com/home-assistant/core/pull/132895
+      name = "watchdog-6.0.0-compat.patch";
+      url = "https://github.com/home-assistant/core/commit/15ac8d66ff4fdd8309fabcb56c78999e06d2a0c5.patch";
+      hash = "sha256-OYzsHg0NfYB1DKyBP45ceVeP7wq8sX7GCqSpepWTfS8=";
+    })
   ];
 
   postPatch = ''
