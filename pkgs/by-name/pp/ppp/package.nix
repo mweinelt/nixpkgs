@@ -11,7 +11,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "2.5.1";
+  version = "2.5.2";
   pname = "ppp";
 
   src = fetchFromGitHub {
@@ -74,6 +74,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     homepage = "https://ppp.samba.org";
+    changelog = "https://github.com/ppp-project/ppp/releases/tag/v${version}";
     description = "Point-to-point implementation to provide Internet connections over serial lines";
     license = with licenses; [
       bsdOriginal
