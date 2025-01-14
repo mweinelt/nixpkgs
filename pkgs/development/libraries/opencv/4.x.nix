@@ -53,7 +53,7 @@
 , pythonPackages
 , enableGtk2 ? false
 , gtk2
-, enableGtk3 ? false
+, enableGtk3 ? true
 , gtk3
 , enableVtk ? false
 , vtk
