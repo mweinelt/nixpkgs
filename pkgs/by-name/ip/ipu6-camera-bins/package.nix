@@ -7,15 +7,15 @@
   zlib,
 }:
 
-stdenv.mkDerivation (finalAttrs: rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "ipu6-camera-bins";
-  version = "unstable-2024-09-27";
+  version = "unstable-2024-11-27";
 
   src = fetchFromGitHub {
     repo = "ipu6-camera-bins";
     owner = "intel";
-    rev = "98ca6f2a54d20f171628055938619972514f7a07";
-    hash = "sha256-DAjAzHMqX41mrfQVpDUJLw4Zjb9pz6Uy3TJjTGIkd6o=";
+    rev = "3c1cdd3e634bb4668a900d75efd4d6292b8c7d1d";
+    hash = "sha256-UE6VciCGvTP932BLJarpLo8o6dG71/6ZtB8maVtL/fM=";
   };
 
   nativeBuildInputs = [
@@ -44,6 +44,10 @@ stdenv.mkDerivation (finalAttrs: rec {
     for pcfile in $out/lib/pkgconfig/*.pc; do
       substituteInPlace $pcfile \
         --replace 'prefix=/usr' "prefix=$out"
+    done
+    for lib in $out/lib/lib*.so.*; do
+      lib=''${lib##*/}
+      ln -s $lib $out/lib/''${lib%.*};
     done
   '';
 
