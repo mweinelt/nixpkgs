@@ -31,14 +31,19 @@ let
 in
 stdenv.mkDerivation {
   pname = "${ipuVersion}-camera-hal";
-  version = "unstable-2024-09-29";
+  version = "unstable-2025-01-07";
 
   src = fetchFromGitHub {
     owner = "intel";
     repo = "ipu6-camera-hal";
-    rev = "f98f72b156563fe8373e4f8d017a9f609676bb33";
-    hash = "sha256-zVcgKW7/GHYd1oMvsaI77cPyj3G68dL+OXBJDz5+Td4=";
+    rev = "8346d93d032a33b0db15bba5ad87854308c3dff5";
+    hash = "sha256-9Ujk2TgnR3pD39Si076rVLeI7aAMIWVI+GWF/Gx26vg=";
   };
+
+  postPatch = ''
+    substituteInPlace src/platformdata/PlatformData.h \
+      --replace-fail '#define CAMERA_DEFAULT_CFG_PATH "/etc/camera/"' '#define CAMERA_DEFAULT_CFG_PATH "${placeholder "out"}/etc/camera/"'
+  '';
 
   nativeBuildInputs = [
     cmake
@@ -50,7 +55,6 @@ stdenv.mkDerivation {
     "-DTARGET_SUFFIX=-${ipuVersion}"
     # missing libiacss
     "-DUSE_PG_LITE_PIPE=ON"
-    "-DCMAKE_BUILD_TYPE=Release"
     "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
     "-DCMAKE_INSTALL_SUB_PATH=${ipuTarget}"
     "-DCMAKE_INSTALL_LIBDIR=lib"
@@ -70,12 +74,6 @@ stdenv.mkDerivation {
     gst_all_1.gst-plugins-base
     libdrm
   ];
-
-  postPatch = ''
-    substituteInPlace src/platformdata/PlatformData.h \
-      --replace '/usr/share/' "${placeholder "out"}/share/" \
-      --replace '#define CAMERA_DEFAULT_CFG_PATH "/etc/camera/"' '#define CAMERA_DEFAULT_CFG_PATH "${placeholder "out"}/etc/camera/"'
-  '';
 
   postInstall = ''
     mkdir -p $out/include/${ipuTarget}/
