@@ -4,7 +4,7 @@
   buildPythonPackage,
   fetchFromGitHub,
   fetchpatch,
-  ffmpeg-full,
+  ffmpeg-headless,
   pytestCheckHook,
   pythonOlder,
   setuptools,
@@ -34,9 +34,9 @@ buildPythonPackage rec {
     })
     # Fix paths to ffmpeg, ffplay and ffprobe
     (replaceVars ./ffmpeg-fix-path.patch {
-      ffmpeg = lib.getExe ffmpeg-full;
-      ffplay = lib.getExe' ffmpeg-full "ffplay";
-      ffprobe = lib.getExe' ffmpeg-full "ffprobe";
+      ffmpeg = lib.getExe ffmpeg-headless;
+      ffplay = lib.getExe' ffmpeg-headless "ffplay";
+      ffprobe = lib.getExe' ffmpeg-headless "ffprobe";
     })
   ];
 
