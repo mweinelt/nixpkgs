@@ -1105,6 +1105,12 @@ with lib.maintainers;
     shortName = "SDL";
   };
 
+  sentry = {
+    members = [ hexa ];
+    scope = "Maintain the Sentry ecosystem";
+    shortName = "Sentry";
+  };
+
   sphinx = {
     members = [ ];
     scope = "Maintain Sphinx related packages.";
