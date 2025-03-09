@@ -15581,6 +15581,8 @@ self: super: with self; {
 
   sentry-arroyo = callPackage ../development/python-modules/sentry-arroyo { };
 
+  sentry-relay = callPackage ../development/python-modules/sentry-relay { };
+
   sentry-sdk = sentry-sdk_1;
 
   sentry-sdk_1 = callPackage ../development/python-modules/sentry-sdk/1.nix { };
