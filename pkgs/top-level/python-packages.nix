@@ -5698,6 +5698,8 @@ self: super: with self; {
 
   google-cloud-bigtable = callPackage ../development/python-modules/google-cloud-bigtable { };
 
+  google-cloud-build = callPackage ../development/python-modules/google-cloud-build { };
+
   google-cloud-compute = callPackage ../development/python-modules/google-cloud-compute { };
 
   google-cloud-container = callPackage ../development/python-modules/google-cloud-container { };
