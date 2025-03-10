@@ -15585,6 +15585,8 @@ self: super: with self; {
 
   sentry-arroyo = callPackage ../development/python-modules/sentry-arroyo { };
 
+  sentry-kafka-schemas = callPackage ../development/python-modules/sentry-kafka-schemas { };
+
   sentry-protos = callPackage ../development/python-modules/sentry-protos { };
 
   sentry-relay = callPackage ../development/python-modules/sentry-relay { };
