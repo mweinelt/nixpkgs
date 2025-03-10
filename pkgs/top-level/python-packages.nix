@@ -15587,6 +15587,8 @@ self: super: with self; {
 
   sentry-kafka-schemas = callPackage ../development/python-modules/sentry-kafka-schemas { };
 
+  sentry-ophio = callPackage ../development/python-modules/sentry-ophio { };
+
   sentry-protos = callPackage ../development/python-modules/sentry-protos { };
 
   sentry-relay = callPackage ../development/python-modules/sentry-relay { };
