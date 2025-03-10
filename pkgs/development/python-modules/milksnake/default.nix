@@ -2,38 +2,35 @@
   lib,
   buildPythonPackage,
   fetchPypi,
-  fetchpatch,
+  setuptools,
   cffi,
+  pip,
+  pytestCheckHook,
 }:
 
 buildPythonPackage rec {
   pname = "milksnake";
-  version = "0.1.5";
-  format = "setuptools";
+  version = "0.1.6";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    extension = "zip";
-    sha256 = "120nprd8lqis7x7zy72536gk2j68f7gxm8gffmx8k4ygifvl7kfz";
+    hash = "sha256-AZj4kytOE2wpwNDUkP8brAP4LDp7Lub2ZuNoO2QxT9k=";
   };
 
-  patches = [
-    (fetchpatch {
-      name = "fix-regex-python-311.patch";
-      url = "https://github.com/getsentry/milksnake/commit/421cc1ffab4d76d01366240c087ffb30d63b744c.diff";
-      hash = "sha256-U/C4CCX8SEOzVXNpOf4hVy2V3Lh6fUrFkz5z+h191C8=";
-    })
-  ];
+  build-system = [ setuptools ];
 
-  propagatedBuildInputs = [ cffi ];
+  dependencies = [ cffi ];
 
   # tests rely on pip/venv
   doCheck = false;
+
+  pythonImportsCheck = [ "milksnake" ];
 
   meta = with lib; {
     description = "Python library that extends setuptools for binary extensions";
     homepage = "https://github.com/getsentry/milksnake";
     license = licenses.asl20;
-    maintainers = with maintainers; [ matthiasbeyer ];
+    maintainers = lib.teams.sentry.members ++ (with maintainers; [ matthiasbeyer ]);
   };
 }
