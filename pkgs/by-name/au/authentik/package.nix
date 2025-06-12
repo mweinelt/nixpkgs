@@ -13,6 +13,9 @@
   nodejs,
   python312,
   makeWrapper,
+  redisTestHook,
+  postgresql,
+  postgresqlTestHook,
 }:
 
 let
@@ -214,6 +217,13 @@ let
         pythonImportsCheck = [ "rest_framework" ];
       };
 
+      drf-jsonschema-serializer = prev.drf-jsonschema-serializer.overridePythonAttrs {
+        disabledTests = [
+          # breaks in the authentik package set, but not outside
+          "test_correct_generated_schema"
+        ];
+      };
+
       authentik-django = prev.buildPythonPackage {
         pname = "authentik-django";
         inherit version src meta;
@@ -327,6 +337,46 @@ let
           ln -s $out/${prev.python.sitePackages}/authentik $out/authentik
           ln -s $out/${prev.python.sitePackages}/lifecycle $out/lifecycle
         '';
+
+        env = {
+          postgresqlEnableTCP = 1;
+          postgresqlTestUserOptions = "LOGIN SUPERUSER";
+          PGUSER = "authentik";
+          PGPASSWORD = "authentik";
+          PGDATABASE = "authentik";
+        };
+
+        nativeCheckInputs = with final; [
+          daphne
+          drf-jsonschema-serializer
+          freezegun
+          k5test
+          requests-mock
+          redisTestHook
+          pdoc
+          postgresql
+          postgresqlTestHook
+          pytestCheckHook
+          pytest-django
+          selenium
+        ];
+
+        disabledTestPaths = [
+          # requires docker
+          "tests/e2e"
+          "tests/integration/test_proxy_docker.py"
+        ];
+
+        preCheck = ''
+          export DJANGO_SETTINGS_MODULE=authentik.root.settings
+          export AUTHENTIK_SECRET_KEY=changeme
+        '';
+
+        postgresqlTestSetupPost = ''
+          #python -m lifecycle.migrate
+        '';
+
+        pytestFlagsArray = [ "authentik" ];
       };
     };
   };
