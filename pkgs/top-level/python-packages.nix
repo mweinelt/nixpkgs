@@ -4239,6 +4239,8 @@ self: super: with self; {
 
   drf-jwt = callPackage ../development/python-modules/drf-jwt { };
 
+  drf-jsonschema-serializer = callPackage ../development/python-modules/drf-jsonschema-serializer { };
+
   drf-nested-routers = callPackage ../development/python-modules/drf-nested-routers { };
 
   drf-orjson-renderer = callPackage ../development/python-modules/drf-orjson-renderer { };
