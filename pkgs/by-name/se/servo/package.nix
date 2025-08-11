@@ -65,13 +65,13 @@ in
 
 rustPlatform.buildRustPackage {
   pname = "servo";
-  version = "0-unstable-2025-07-30";
+  version = "0-unstable-2025-08-11";
 
   src = fetchFromGitHub {
     owner = "servo";
     repo = "servo";
-    rev = "0e180578632facc10f0e8fb29df9084369adc600";
-    hash = "sha256-4EQ15jOZNYjGmhIOJivHT8R6BeT6moGj+AI9DBq58v4=";
+    rev = "68ad03c40a3a892e18cfb5d13a726f1d1676e227";
+    hash = "sha256-5FyUmtFlYNrU/AIqA+g4Pp63P8oI+SzK+tdnKquo8pw=";
     # Breaks reproducibility depending on whether the picked commit
     # has other ref-names or not, which may change over time, i.e. with
     # "ref-names: HEAD -> main" as long this commit is the branch HEAD
@@ -81,7 +81,7 @@ rustPlatform.buildRustPackage {
     '';
   };
 
-  cargoHash = "sha256-fqIlN+6SEY0LVrUk47U12TuVoRte0oCGJhO7DHovzBM=";
+  cargoHash = "sha256-hYWLIxun3HjXuEz5ltf0p5ASmMmS5OLMLSeaQqEwwnE=";
 
   # set `HOME` to a temp dir for write access
   # Fix invalid option errors during linking (https://github.com/mozilla/nixpkgs-mozilla/commit/c72ff151a3e25f14182569679ed4cd22ef352328)
