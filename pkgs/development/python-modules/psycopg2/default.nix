@@ -2,13 +2,13 @@
   stdenv,
   lib,
   buildPythonPackage,
-  pythonOlder,
   isPyPy,
   fetchPypi,
   libpq,
   postgresql,
   postgresqlTestHook,
   openssl,
+  setuptools,
   sphinxHook,
   sphinx-better-theme,
   buildPackages,
@@ -17,11 +17,11 @@
 buildPythonPackage rec {
   pname = "psycopg2";
   version = "2.9.11";
-  format = "setuptools";
+  pyproject = true;
 
   # Extension modules don't work well with PyPy. Use psycopg2cffi instead.
   # c.f. https://github.com/NixOS/nixpkgs/pull/104151#issuecomment-729750892
-  disabled = pythonOlder "3.6" || isPyPy;
+  disabled = isPyPy;
 
   outputs = [
     "out"
@@ -45,6 +45,8 @@ buildPythonPackage rec {
     sphinxHook
     sphinx-better-theme
   ];
+
+  build-system = [ setuptools ];
 
   buildInputs = [ libpq ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ openssl ];
 
