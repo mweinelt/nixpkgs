@@ -8,7 +8,7 @@
 
 buildPythonPackage {
   pname = "mac-vendor-lookup";
-  version = "0.1.12";
+  version = "0.1.13";
   format = "setuptools";
 
   src = fetchFromGitHub {
