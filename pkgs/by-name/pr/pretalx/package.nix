@@ -57,8 +57,8 @@ let
     platforms = lib.platforms.linux;
   };
 
-  frontend = buildNpmPackage {
-    pname = "pretalx-frontend";
+  pretix-schedule-editor = buildNpmPackage {
+    pname = "pretalx-schedule-editorc";
     inherit version src;
 
     sourceRoot = "${src.name}/src/pretalx/frontend/schedule-editor";
@@ -66,6 +66,15 @@ let
     npmDepsHash = "sha256-voHiml0nFWZIST39D5ErB0xTiWAOHN9OZinYutuQcdg=";
 
     npmBuildScript = "build";
+
+    installPhase = ''
+      runHook preInstall
+
+      mkdir -p $out
+      cp dist/** $out/
+
+      runHook postInstall
+    '';
 
     inherit meta;
   };
@@ -80,10 +89,11 @@ python.pkgs.buildPythonApplication rec {
     "static"
   ];
 
-  postPatch = ''
-    substituteInPlace src/pretalx/common/management/commands/rebuild.py \
-      --replace 'subprocess.check_call(["npm", "run", "build"], cwd=frontend_dir, env=env)' ""
-  '';
+  patches = [
+    # don't run npm during rebuild command, we already use a separate derivation
+    # to build static assets
+    ./rebuild-no-npm.patch
+  ];
 
   nativeBuildInputs = [
     gettext
@@ -169,8 +179,8 @@ python.pkgs.buildPythonApplication rec {
   };
 
   postBuild = ''
+    # npm build happens in static derivation
     rm -r ./src/pretalx/frontend/schedule-editor
-    ln -s ${frontend}/lib/node_modules/@pretalx/schedule-editor ./src/pretalx/frontend/schedule-editor
 
     # Generate all static files, see https://docs.pretalx.org/administrator/commands.html#python-m-pretalx-rebuild
     PYTHONPATH=$PYTHONPATH:./src python -m pretalx rebuild
@@ -187,12 +197,10 @@ python.pkgs.buildPythonApplication rec {
       -not -path "$out/${python.sitePackages}/pretalx/static/fonts*" \
       -delete
 
-    # Copy generated static files into dedicated output
+    # Copy and merge static files
     mkdir -p $static
     cp -r ./src/static.dist/** $static/
-
-    # Copy frontend files
-    ln -s ${frontend}/lib/node_modules/@pretalx/schedule-editor/dist/* $static
+    cp -r ${pretix-schedule-editor}/** $static/
   '';
 
   preCheck = ''
