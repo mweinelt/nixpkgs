@@ -76,7 +76,7 @@ in
   glib,
   gnum4,
   gtk3,
-  icu77, # if you fiddle with the icu parameters, please check Thunderbird's overrides
+  icu77,
   icu78,
   libGL,
   libGLU,
@@ -235,6 +235,8 @@ let
       bintools = if ltoSupport then buildPackages.rustc.llvmPackages.bintools else stdenv.cc.bintools;
     }
   );
+
+  icu = if (lib.versionAtLeast version "147") then icu78 else icu77;
 
   # Compile the wasm32 sysroot to build the RLBox Sandbox
   # https://hacks.mozilla.org/2021/12/webassembly-and-back-again-fine-grained-sandboxing-in-firefox-95/
@@ -506,7 +508,8 @@ buildStdenv.mkDerivation {
     # MacOS builds use bundled versions of libraries: https://bugzilla.mozilla.org/show_bug.cgi?id=1776255
     "--enable-system-pixman"
     "--with-system-ffi"
-    "--with-system-icu"
+    # Mozilla vendors 10+ patches and ICU upstream is very slow to adopt them
+    # "--with-system-icu"
     "--with-system-jpeg"
     "--with-system-libevent"
     "--with-system-libvpx"
@@ -578,6 +581,7 @@ buildStdenv.mkDerivation {
       freetype
       glib
       gtk3
+      icu
       libffi
       libevent
       libjpeg
@@ -609,7 +613,6 @@ buildStdenv.mkDerivation {
       libdrm
     ]
   ))
-  ++ [ (if (lib.versionAtLeast version "147") then icu78 else icu77) ]
   ++ lib.optional gssSupport libkrb5
   ++ lib.optional jemallocSupport jemalloc
   ++ extraBuildInputs;
