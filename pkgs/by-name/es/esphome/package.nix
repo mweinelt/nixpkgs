@@ -31,16 +31,16 @@ let
     };
   };
 in
-python.pkgs.buildPythonApplication rec {
+python.pkgs.buildPythonApplication (finalAttrs: {
   pname = "esphome";
-  version = "2026.1.3";
+  version = "2026.1.4";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "esphome";
     repo = "esphome";
-    tag = version;
-    hash = "sha256-Y9n8nwHQeU7rWwgIXu93ufP1dTDIhJbSWPAnYVA3ZdI=";
+    tag = finalAttrs.version;
+    hash = "sha256-j7PlHGLBY9M5jxzvOt6H+zr3nCNPpM/FCMLgevt6MnM=";
   };
 
   patches = [
@@ -115,7 +115,7 @@ python.pkgs.buildPythonApplication rec {
         git
       ]
     }"
-    "--prefix PYTHONPATH : ${python.pkgs.makePythonPath dependencies}" # will show better error messages
+    "--prefix PYTHONPATH : ${python.pkgs.makePythonPath finalAttrs.passthru.dependencies}" # will show better error messages
     "--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ stdenv.cc.cc ]}"
     "--set ESPHOME_USE_SUBPROCESS ''"
     # https://github.com/NixOS/nixpkgs/issues/362193
@@ -185,7 +185,7 @@ python.pkgs.buildPythonApplication rec {
   };
 
   meta = {
-    changelog = "https://github.com/esphome/esphome/releases/tag/${version}";
+    changelog = "https://github.com/esphome/esphome/releases/tag/${finalAttrs.src.tag}";
     description = "Make creating custom firmwares for ESP32/ESP8266 super easy";
     homepage = "https://esphome.io/";
     license = with lib.licenses; [
@@ -198,4 +198,4 @@ python.pkgs.buildPythonApplication rec {
     ];
     mainProgram = "esphome";
   };
-}
+})
