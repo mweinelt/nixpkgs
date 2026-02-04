@@ -17197,6 +17197,8 @@ self: super: with self; {
 
   seqdiag = callPackage ../development/python-modules/seqdiag { };
 
+  seqio = callPackage ../development/python-modules/seqio { };
+
   seqeval = callPackage ../development/python-modules/seqeval { };
 
   serialio = callPackage ../development/python-modules/serialio { };
