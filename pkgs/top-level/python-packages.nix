@@ -5406,6 +5406,8 @@ self: super: with self; {
 
   fickling = callPackage ../development/python-modules/fickling { };
 
+  fiddle = callPackage ../development/python-modules/fiddle { };
+
   fido2 = callPackage ../development/python-modules/fido2 { };
 
   fields = callPackage ../development/python-modules/fields { };
