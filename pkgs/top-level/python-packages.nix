@@ -15861,6 +15861,8 @@ self: super: with self; {
 
   pytweening = callPackage ../development/python-modules/pytweening { };
 
+  pytype = callPackage ../development/python-modules/pytype { };
+
   pytz = callPackage ../development/python-modules/pytz {
     inherit (pkgs) tzdata;
   };
