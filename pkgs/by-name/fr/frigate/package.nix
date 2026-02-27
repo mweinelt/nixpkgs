@@ -38,6 +38,9 @@ let
           hash = "sha256-95xtUzzIxxvDtpHX/5uCHnTQTB8Fc08DZGUOR/SdKLs=";
         };
       });
+
+      huggingface-hub = super.huggingface-hub_0;
+      transformers = super.transformers_4;
     };
   };
   python3Packages = python.pkgs;
