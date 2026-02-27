@@ -7182,6 +7182,8 @@ self: super: with self; {
 
   huey = callPackage ../development/python-modules/huey { };
 
+  huggingface-hub_0 = callPackage ../development/python-modules/huggingface-hub/0.nix { };
+
   huggingface-hub = callPackage ../development/python-modules/huggingface-hub { };
 
   human-readable = callPackage ../development/python-modules/human-readable { };
