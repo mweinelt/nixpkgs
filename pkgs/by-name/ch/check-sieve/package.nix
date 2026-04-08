@@ -5,32 +5,34 @@
   bison,
   diffutils,
   flex,
-  python3,
-  nix-update-script,
+  python3Packages,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "check-sieve";
-  version = "0.11";
+  version = "1.0.0";
 
   src = fetchFromGitHub {
     owner = "dburkart";
     repo = "check-sieve";
-    tag = "check-sieve-${finalAttrs.version}";
-    hash = "sha256-vmfHXjcZ5J/+kO3/a0p8krLOuC67+q8SxcPJgW+UaTw=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-dElVfLSVtlELleuxCScR6BGuLsJ+KRqcNA8y0lgrBfI=";
   };
+
+  patches = [
+    # https://github.com/dburkart/check-sieve/pull/111
+    ./pr111.patch
+  ];
 
   nativeBuildInputs = [
     bison
     flex
   ];
 
-  nativeCheckInputs = [
-    (python3.withPackages (p: [ p.setuptools ]))
-  ];
+  enableParallelBuilding = true;
 
-  # https://github.com/dburkart/check-sieve/issues/67
-  # Remove after the next (>0.10) release
-  env.NIX_CFLAGS_COMPILE = "-Wno-error=unused-result";
+  nativeCheckInputs = [
+    python3Packages.setuptools
+  ];
 
   installPhase = ''
     runHook preInstall
@@ -39,18 +41,13 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   preCheck = ''
-    substituteInPlace test/AST/util.py \
-      --replace-fail "/usr/bin/diff" "${diffutils}/bin/diff"
-    # Disable flaky tests: https://github.com/dburkart/check-sieve/issues/68
-    # Remove after the next (>0.10) release
-    rm -rf test/{6785,7352}
+    substituteInPlace \
+      test/AST/util.py \
+      test/simulate/util.py \
+      --replace-fail "/usr/bin/diff" "${lib.getExe' diffutils "diff"}"
   '';
 
   doCheck = true;
-
-  passthru.updateScript = nix-update-script {
-    extraArgs = [ "--version-regex=check-sieve-(.*)" ];
-  };
 
   meta = {
     description = "Syntax checker for mail sieves";
