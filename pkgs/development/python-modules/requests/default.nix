@@ -17,7 +17,7 @@
 
 buildPythonPackage rec {
   pname = "requests";
-  version = "2.33.1";
+  version = "2.34.0";
   pyproject = true;
 
   __darwinAllowLocalNetworking = true;
@@ -26,7 +26,7 @@ buildPythonPackage rec {
     owner = "psf";
     repo = "requests";
     tag = "v${version}";
-    hash = "sha256-cQnCTMmpdkvWwt7RFAIhAfmhVwGVn0Y8Z5Tr6lzDmS8=";
+    hash = "sha256-DDx+UV3OuCLUXM7ESbURCGeZ7t2acFEfMTOMcJdfUbI=";
   };
 
   build-system = [ setuptools ];
