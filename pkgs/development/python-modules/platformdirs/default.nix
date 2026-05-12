@@ -11,14 +11,14 @@
 
 buildPythonPackage rec {
   pname = "platformdirs";
-  version = "4.5.1";
+  version = "4.9.6";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "tox-dev";
     repo = "platformdirs";
     tag = version;
-    hash = "sha256-wDhhfS8r0fCYOUJUu2kwH+fyTPmS+aPUiqWN21Fedoc=";
+    hash = "sha256-/aoJquWRn1UQZa96uZba15tDO+IGEHN9/duu9JYXmd4=";
   };
 
   build-system = [
@@ -30,6 +30,12 @@ buildPythonPackage rec {
     appdirs
     pytest-mock
     pytestCheckHook
+  ];
+
+  disabledTests = [
+    # expects site prefix below /usr/local/share, but we're in the nix store
+    "test_use_site_for_root_as_root"
+    "test_use_site_for_root_bypasses_xdg_user_vars"
   ];
 
   pythonImportsCheck = [ "platformdirs" ];
