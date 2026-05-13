@@ -237,7 +237,6 @@ let
         ''
           ${lib.concatStringsSep " " data.extraLegoFlags} -
           ${lib.concatStringsSep " " data.extraLegoRunFlags} -
-          ${lib.concatStringsSep " " data.extraLegoRenewFlags} -
           ${toString acmeServer} ${toString data.dnsProvider}
           ${toString data.ocspMustStaple} ${data.keyType}
         ''
@@ -256,7 +255,7 @@ let
               "--dns"
               data.dnsProvider
             ]
-            ++ lib.optionals (!data.dnsPropagationCheck) [ "--dns.propagation-disable-ans" ]
+            ++ lib.optionals (!data.dnsPropagationCheck) [ "--dns.propagation.disable-ans" ]
             ++ lib.optionals (data.dnsResolver != null) [
               "--dns.resolvers"
               data.dnsResolver
@@ -271,7 +270,7 @@ let
         else if data.listenHTTP != null then
           [
             "--http"
-            "--http.port"
+            "--http.address"
             data.listenHTTP
           ]
         else
@@ -281,54 +280,47 @@ let
             data.webroot
           ];
 
-      commonOpts = [
-        "--accept-tos" # Checking the option is covered by the assertions
-        "--path"
-        "."
+      globalOpts = [
       ]
-      ++ lib.optionals (data.email != null) [
-        "--email"
-        data.email
-      ]
-      ++ protocolOpts
-      ++ lib.optionals (acmeServer != null) [
-        "--server"
-        acmeServer
-      ]
-      ++ lib.optionals (data.csr != null) [
-        "--csr"
-        data.csr
-      ]
-      ++ lib.optionals (data.csr == null) [
-        "--key-type"
-        data.keyType
-        "-d"
-        data.domain
-      ]
-      ++ lib.concatMap (name: [
-        "-d"
-        name
-      ]) extraDomains
       ++ data.extraLegoFlags;
 
-      # Although --must-staple is common to both modes, it is not declared as a
-      # mode-agnostic argument in lego and thus must come after the mode.
       runOpts = lib.escapeShellArgs (
-        commonOpts
-        ++ [ "run" ]
+        globalOpts
+        ++ [
+          "run"
+          "--accept-tos" # Checking the option is covered by the assertions
+          "--path"
+          "."
+          "--no-random-sleep"
+          # Check and ensure that the cert's domain list matches those passed in the domains argument
+          "--force-cert-domains"
+        ]
+        ++ lib.optionals (data.email != null) [
+          "--email"
+          data.email
+        ]
+        ++ protocolOpts
+        ++ lib.optionals (acmeServer != null) [
+          "--server"
+          acmeServer
+        ]
+        ++ lib.optionals (data.csr != null) [
+          "--csr"
+          data.csr
+        ]
+        ++ lib.optionals (data.csr == null) [
+          "--key-type"
+          data.keyType
+          "--domains"
+          data.domain
+        ]
+        ++ lib.concatMap (name: [
+          "--domains"
+          name
+        ]) extraDomains
         ++ lib.optionals data.ocspMustStaple [ "--must-staple" ]
         ++ lib.optionals (data.profile != null) [ "--profile=${data.profile}" ]
         ++ data.extraLegoRunFlags
-      );
-      renewOpts = lib.escapeShellArgs (
-        commonOpts
-        ++ [
-          "renew"
-          "--no-random-sleep"
-        ]
-        ++ lib.optionals data.ocspMustStaple [ "--must-staple" ]
-        ++ lib.optionals (data.profile != null) [ "--profile=${data.profile}" ]
-        ++ data.extraLegoRenewFlags
       );
 
       certificateKey = if data.csrKey != null then "${data.csrKey}" else "certificates/${keyName}.key";
@@ -579,37 +571,29 @@ let
 
           echo '${domainHash}' > domainhash.txt
 
-          # Check if a new order is needed
-          # We can only renew if the list of domains has not changed.
-          # We also need an account key. Avoids #190493
-          if cmp -s domainhash.txt certificates/domainhash.txt && [ -e '${certificateKey}' ] && \
-            [ -e 'certificates/${keyName}.crt' ] && \
-            [ -n "$(find accounts -name '${
-              if (data.email != null) then data.email else placeholderEmail
-            }.key')" ];
-          then
-            # Even if a cert is not expired, it may be revoked by the CA.
-            # Try to renew, and silently fail if the cert is not expired.
-            # Avoids #85794 and resolves #129838
-            if ! lego ${renewOpts} ${
-              if data.validMinDays != null then "--days ${toString data.validMinDays}" else "--dynamic"
-            }; then
-              if is_expiration_skippable out/full.pem; then
-                echo 1>&2 "nixos-acme: Ignoring failed renewal because expiration isn't due yet"
-              else
+          # Even if a cert is not expired, it may be revoked by the CA.
+          # Try to renew, and silently fail if the cert is not expired.
+          # Avoids #85794 and resolves #129838
+          if ! lego ${runOpts} ${
+            lib.optionalString (data.validMinDays != null) "--renew-days ${toString data.validMinDays}"
+          }; then
+            echo $?
+            if is_expiration_skippable out/full.pem; then
+              echo 1>&2 "nixos-acme: Ignoring failed renewal because expiration isn't due yet"
+            else
+              if [ -s out/full.pem; ]; then
+                # Renewal failure below renewal threshold
                 # High number to avoid Systemd reserved codes.
                 exit 11
+              else
+                # Produce a nice error for those doing their first nixos-rebuild with these certs
+                echo Failed to fetch certificates. \
+                  This may mean your DNS records are set up incorrectly. \
+                  Self-signed certs are in place and dependant services will still start.
+                # High number to avoid Systemd reserved codes.
+                exit 10
               fi
             fi
-          # Do a full run
-          elif ! lego ${runOpts}; then
-            # Produce a nice error for those doing their first nixos-rebuild with these certs
-            echo Failed to fetch certificates. \
-              This may mean your DNS records are set up incorrectly. \
-              Self-signed certs are in place and dependant services will still start.
-            # Exit 10 so that users can potentially amend SuccessExitStatus to ignore this error.
-            # High number to avoid Systemd reserved codes.
-            exit 10
           fi
 
           mv domainhash.txt certificates/
@@ -874,14 +858,6 @@ let
           inherit (defaultAndText "extraLegoFlags" [ ]) default defaultText;
           description = ''
             Additional global flags to pass to all lego commands.
-          '';
-        };
-
-        extraLegoRenewFlags = lib.mkOption {
-          type = lib.types.listOf lib.types.str;
-          inherit (defaultAndText "extraLegoRenewFlags" [ ]) default defaultText;
-          description = ''
-            Additional flags to pass to lego renew.
           '';
         };
 
