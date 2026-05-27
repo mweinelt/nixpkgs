@@ -1441,6 +1441,10 @@ in
       gid = config.ids.gids.matrix-synapse;
     };
 
+    systemd.slices.system-matrix-synapse = {
+      description = "Matrix Synapse Slice";
+    };
+
     systemd.targets.matrix-synapse = lib.mkIf hasWorkers {
       description = "Synapse Matrix parent target";
       wants = [ "network-online.target" ];
@@ -1479,6 +1483,7 @@ in
             RuntimeDirectoryPreserve = true;
             ExecReload = "${pkgs.util-linux}/bin/kill -HUP $MAINPID";
             Restart = "on-failure";
+            Slice = "system-matrix-synapse.slice";
             UMask = "0077";
 
             # Security Hardening
