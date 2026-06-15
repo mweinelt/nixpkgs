@@ -20,7 +20,7 @@ let
     lib.concatStringsSep "\n\n" extraCertificateStrings
   );
 
-  version = "3.123";
+  version = "3.124";
   meta = {
     homepage = "https://firefox-source-docs.mozilla.org/security/nss/runbooks/rootstore.html#root-store-consumers";
     description = "Bundle of X.509 certificates of public Certificate Authorities (CA)";
