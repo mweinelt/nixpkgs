@@ -175,6 +175,8 @@ stdenv.mkDerivation rec {
     ];
   };
 
+  requiredSystemFeatures = [ "big-parallel" ];
+
   meta = {
     description = "High-level performance-oriented dynamical language for technical computing";
     mainProgram = "julia";
