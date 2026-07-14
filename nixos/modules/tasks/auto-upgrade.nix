@@ -219,7 +219,7 @@ in
         [ "--no-build-output" ]
         ++ lib.optionals (cfg.channel != null) [
           "-I"
-          "nixpkgs=${cfg.channel}/nixexprs.tar.xz"
+          "nixpkgs=${cfg.channel}/nixexprs.tar.zst"
         ]
       else
         [
