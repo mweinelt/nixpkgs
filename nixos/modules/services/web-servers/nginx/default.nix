@@ -241,14 +241,17 @@ let
             }
 
             ${optionalString cfg.recommendedTlsSettings ''
-              # Consider https://ssl-config.mozilla.org/#server=nginx&config=intermediate as the lower bound
+              # Consider https://configurator.tlsref.org/#server=nginx&config=intermediate as the lower bound
 
               ssl_conf_command Groups "X25519MLKEM768:X25519:P-256:P-384";
-              ssl_session_timeout 1d;
-              ssl_session_cache shared:SSL:10m;
-              # We don't enable insecure ciphers by default, so this allows
-              # clients to pick the most performant, per https://github.com/mozilla/server-side-tls/issues/260
+
+              # Allow clients to choose the most performant ciphersuite from our safe allowlist
+              # https://github.com/mozilla/server-side-tls/issues/260
               ssl_prefer_server_ciphers off;
+
+              # Support TLS session resumption (cache and tickets)
+              ssl_session_cache shared:SSL:10m; # ~40k sessions
+              ssl_session_timeout 1d;
             ''}
 
             ${optionalString cfg.recommendedBrotliSettings ''
@@ -1047,7 +1050,7 @@ in
 
       sslCiphers = mkOption {
         type = types.nullOr (types.either types.str (types.listOf types.str));
-        # Keep in sync with https://ssl-config.mozilla.org/#server=nginx&config=intermediate
+        # Keep in sync with https://configurator.tlsref.org/#server=nginx&config=intermediate
         default = [
           "ECDHE-ECDSA-AES128-GCM-SHA256"
           "ECDHE-RSA-AES128-GCM-SHA256"
